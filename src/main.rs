@@ -16,25 +16,14 @@ fn main() {
         config.get_bitwarden_admin_token().clone(),
     );
 
-    /*
-     * let auth_response = client.auth();
-     * println!("Auth Response: {:?}", auth_response);
-     */
-
-    match do_search(&config) {
-        Ok(_) => (),
-        Err(e) => println!("{}", e),
-    }
-
+    // TODO: Use command line args to differentiate if we invite once or start loop
     if let Err(e) = invite_from_ldap(&config, &mut client) {
         println!("{}", e);
     }
 
-    /*
-     * if let Err(e) = start_sync_loop(&config, %mut client) {
-     *     println!("{}", e);
-     * }
-     */
+    if let Err(e) = start_sync_loop(&config, &mut client) {
+        println!("{}", e);
+    }
 }
 
 /// Creates an LDAP connection, authenticating if necessary
@@ -78,20 +67,7 @@ fn search_entries(config: &config::Config) -> Result<Vec<SearchEntry>, Box<Error
     Ok(entries)
 }
 
-/// Perform a simple search and list users
-fn do_search(config: &config::Config) -> Result<(), Box<Error>> {
-    let mail_field = config.get_ldap_mail_field();
-    let entries = search_entries(config)?;
-    for user in entries {
-        println!("{:?}", user);
-        if let Some(user_email) = user.attrs[mail_field.as_str()].first() {
-            println!("{}", user_email);
-        }
-    }
-
-    Ok(())
-}
-
+/// Invite all LDAP users to Bitwarden
 fn invite_from_ldap(
     config: &config::Config,
     client: &mut bw_admin::Client,
@@ -108,12 +84,14 @@ fn invite_from_ldap(
     Ok(())
 }
 
-/*
- * fn start_sync_loop(config: &config::Config) -> Result<(), Box<Error>> {
- *     let interval = Duration::from_secs(config.get_ldap_sync_interval_seconds());
- *     loop {
- *         invite_from_ldap(config)?;
- *         sleep(interval);
- *     }
- * }
- */
+/// Begin sync loop to invite LDAP users to Bitwarden
+fn start_sync_loop(
+    config: &config::Config,
+    client: &mut bw_admin::Client,
+) -> Result<(), Box<Error>> {
+    let interval = Duration::from_secs(config.get_ldap_sync_interval_seconds());
+    loop {
+        invite_from_ldap(config, client)?;
+        sleep(interval);
+    }
+}

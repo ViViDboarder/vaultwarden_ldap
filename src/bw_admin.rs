@@ -15,6 +15,7 @@ pub struct Client {
 }
 
 impl Client {
+    /// Create new instance of client
     pub fn new(url: String, admin_token: String) -> Client {
         Client {
             url,
@@ -24,9 +25,15 @@ impl Client {
         }
     }
 
+    /// Authenticate client
     fn auth(&mut self) -> Response {
         let cookie_created = Instant::now();
-        let result = reqwest::Client::new()
+        let client = reqwest::Client::builder()
+            // Avoid redirects because server will redirect to admin page after auth
+            .redirect(reqwest::RedirectPolicy::none())
+            .build()
+            .unwrap();
+        let result = client
             .post(format!("{}{}", &self.url, "/admin/").as_str())
             .form(&[("token", &self.admin_token)])
             .send()
@@ -36,18 +43,17 @@ impl Client {
 
         // TODO: Handle error statuses
 
-        println!("Auth headers: {:?}", result.headers());
-
         if let Some(cookie) = result.headers().get(reqwest::header::SET_COOKIE) {
             self.cookie = cookie.to_str().map(|s| String::from(s)).ok();
             self.cookie_created = Some(cookie_created);
         } else {
-            panic!("No cookie to set!")
+            panic!("Could not authenticate.")
         }
 
         result
     }
 
+    /// Ensure that the client has a current auth cookie
     fn ensure_auth(&mut self) {
         match &self.cookie {
             Some(_) => {
@@ -55,18 +61,17 @@ impl Client {
                     .cookie_created
                     .map_or(true, |created| (created.elapsed() >= COOKIE_LIFESPAN))
                 {
-                    let response = self.auth();
-                    println!("Auth response: {:?}", response);
+                    self.auth();
                 }
             }
             None => {
-                let response = self.auth();
-                println!("Auth response: {:?}", response);
+                self.auth();
             }
         };
         // TODO: handle errors
     }
 
+    /// Make an authenticated GET to Bitwarden Admin
     fn get(&mut self, path: &str) -> Response {
         self.ensure_auth();
 
@@ -90,6 +95,7 @@ impl Client {
         }
     }
 
+    /// Make authenticated POST to Bitwarden Admin with JSON data
     fn post(&mut self, path: &str, json: &HashMap<String, String>) -> Response {
         self.ensure_auth();
 
@@ -114,6 +120,7 @@ impl Client {
         }
     }
 
+    /// Invite user with provided email
     pub fn invite(&mut self, email: &str) -> Response {
         let mut json = HashMap::new();
         json.insert("email".to_string(), email.to_string());
