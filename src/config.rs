@@ -35,15 +35,23 @@ pub fn read_config() -> Config {
 #[serde(deny_unknown_fields)]
 /// Contains all config values for LDAP syncing
 pub struct Config {
+    // Bitwarden connection config
+    bitwarden_url: String,
+    bitwarden_admin_token: String,
+    // LDAP Connection config
     ldap_host: String,
     ldap_scheme: Option<String>,
     ldap_ssl: Option<bool>,
     ldap_port: Option<u16>,
+    // LDAP auth config
     ldap_bind_dn: String,
     ldap_bind_password: Pass,
+    // LDAP search config
     ldap_search_base_dn: String,
     ldap_search_filter: String,
+    // LDAP record attributes
     ldap_mail_field: Option<String>,
+    // Interval syncing config
     ldap_sync_interval_seconds: Option<u64>,
 }
 
@@ -51,6 +59,14 @@ impl Config {
     /// Create a config instance from file
     pub fn from_file() -> Config {
         read_config()
+    }
+
+    pub fn get_bitwarden_url(&self) -> String {
+        self.bitwarden_url.clone()
+    }
+
+    pub fn get_bitwarden_admin_token(&self) -> String {
+        self.bitwarden_admin_token.clone()
     }
 
     pub fn get_ldap_url(&self) -> String {
