@@ -1,2 +1,2 @@
-# bwrs_ldap_directory
+# bitwarden_rs_ldap
 LDAP directory connector for bitwarden_rs

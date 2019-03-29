@@ -1,0 +1,29 @@
+version: '3'
+services:
+  ldap:
+    image: osixia/openldap
+    ports:
+      - 389:389
+      - 636:636
+    volumes:
+      - /var/lib/ldap
+      - /etc/ldap/slapd.d
+    environment:
+      LDAP_READONLY_USER: 'true'
+      LDAP_READONLY_USER_USERNAME: readonly
+      LDAP_READONLY_USER_PASSWORD: readonly
+  admin:
+    image: osixia/phpldapadmin
+    ports:
+      - 8001:80
+    environment:
+      PHPLDAPADMIN_HTTPS: 'false'
+      PHPLDAPADMIN_LDAP_HOSTS: ldap
+  admin-host:
+    image: osixia/phpldapadmin
+    ports:
+      - 80:80
+    network_mode: "host"
+    environment:
+      PHPLDAPADMIN_HTTPS: 'false'
+      PHPLDAPADMIN_LDAP_HOSTS: 0.0.0.0
