@@ -1,0 +1,28 @@
+version: '3'
+services:
+  ldap_sync:
+    build: .
+
+  bitwarden:
+    image: mprasil/bitwarden_rs
+
+  ldap:
+    image: osixia/openldap
+    ports:
+      - 389:389
+      - 636:636
+    volumes:
+      - /var/lib/ldap
+      - /etc/ldap/slapd.d
+    environment:
+      LDAP_READONLY_USER: 'true'
+      LDAP_READONLY_USER_USERNAME: readonly
+      LDAP_READONLY_USER_PASSWORD: readonly
+
+  ldap_admin:
+    image: osixia/phpldapadmin
+    ports:
+      - 8001:80
+    environment:
+      PHPLDAPADMIN_HTTPS: 'false'
+      PHPLDAPADMIN_LDAP_HOSTS: ldap
