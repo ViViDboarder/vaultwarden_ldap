@@ -1,11 +1,29 @@
 extern crate reqwest;
-extern crate serde_json;
+extern crate serde;
 
 use reqwest::Response;
+use serde::Deserialize;
 use std::collections::HashMap;
+use std::error::Error;
 use std::time::{Duration, Instant};
 
 const COOKIE_LIFESPAN: Duration = Duration::from_secs(20 * 60);
+
+#[derive(Deserialize)]
+pub struct User {
+    Email: String,
+    #[serde(rename = "_Enabled")]
+    Enabled: bool,
+}
+
+impl User {
+    pub fn get_email(&self) -> String {
+        self.Email.clone()
+    }
+    pub fn is_enabled(&self) -> bool {
+        self.Enabled
+    }
+}
 
 pub struct Client {
     url: String,
@@ -126,5 +144,11 @@ impl Client {
         json.insert("email".to_string(), email.to_string());
 
         self.post("/invite", &json)
+    }
+
+    /// Get all existing users
+    pub fn users(&mut self) -> Result<Vec<User>, Box<Error>> {
+        let all_users: Vec<User> = self.get("/users").json()?;
+        Ok(all_users)
     }
 }

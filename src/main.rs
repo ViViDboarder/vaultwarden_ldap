@@ -16,6 +16,18 @@ fn main() {
         config.get_bitwarden_admin_token().clone(),
     );
 
+    match client.users() {
+        Ok(users) => {
+            for user in users {
+                println!("Existing user: {}", user.get_email());
+            }
+        }
+        Err(e) => {
+            println!("Could not get users");
+            panic!("{}", e);
+        }
+    }
+
     // TODO: Use command line args to differentiate if we invite once or start loop
     if let Err(e) = invite_from_ldap(&config, &mut client) {
         println!("{}", e);
