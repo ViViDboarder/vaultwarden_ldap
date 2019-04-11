@@ -27,7 +27,5 @@ Configuration values are as follows:
 
 ## Future
 
-* Query existing users to avoid redundant invites
-* Command line flags to select if polling is desired
 * Any kind of proper logging
 * Tests
