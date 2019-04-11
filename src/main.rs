@@ -2,7 +2,6 @@ extern crate ldap3;
 
 use std::collections::HashSet;
 use std::error::Error;
-use std::env;
 use std::thread::sleep;
 use std::time::Duration;
 
@@ -11,24 +10,6 @@ use ldap3::{DerefAliases, LdapConn, Scope, SearchEntry, SearchOptions};
 mod bw_admin;
 mod config;
 
-/// Container for args parsed from the command line
-struct ParsedArgs {
-    start_loop: bool,
-}
-
-impl ParsedArgs {
-    pub parse() -> ParsedArgs {
-        let mut parsed_args = ParsedArgs {};
-        for arg in env::args().collect() {
-            if arg == "--loop" {
-                parsed_args.start_loop = true;
-            }
-        }
-
-        parsed_args.clone()
-    }
-}
-
 fn main() {
     let config = config::Config::from_file();
     let mut client = bw_admin::Client::new(
@@ -36,8 +17,7 @@ fn main() {
         config.get_bitwarden_admin_token().clone(),
     );
 
-    let parsed_args = ParsedArgs::parse();
-    if let Err(e) = invite_users(&config, &mut client, parsed_args.start_loop) {
+    if let Err(e) = invite_users(&config, &mut client, config.get_ldap_sync_loop()) {
         panic!("{}", e);
     }
 }
@@ -47,13 +27,13 @@ fn invite_users(
     config: &config::Config,
     client: &mut bw_admin::Client,
     start_loop: bool,
-) -> Result((), Box<Error>> {
-    let user_emails = get_existing_users(&mut client)?;
+) -> Result<(), Box<Error>> {
+    // TODO: Better error handling to differentiate failure to connect to Bitwarden vs LDAP
 
     if start_loop {
-        start_sync_loop(&config, &mut client)?;
+        start_sync_loop(config, client)?;
     } else {
-        invite_from_ldap(&config, &mut client)?;
+        invite_from_ldap(config, client)?;
     }
 
     Ok(())
@@ -61,10 +41,15 @@ fn invite_users(
 
 /// Creates set of email addresses for users that already exist in Bitwarden
 fn get_existing_users(client: &mut bw_admin::Client) -> Result<HashSet<String>, Box<Error>> {
-    let all_users = client.users()?;
+    let all_users = client.users_and_invites()?;
     let mut user_emails = HashSet::with_capacity(all_users.len());
-    for user in client.users()? {
+    for user in all_users {
         user_emails.insert(user.get_email());
+        if user.is_enabled() {
+            println!("Existing user or invite found with email: {}", user.get_email());
+        } else {
+            println!("Existing disabled user found with email: {}", user.get_email());
+        }
     }
 
     Ok(user_emails)
@@ -87,6 +72,10 @@ fn search_entries(config: &config::Config) -> Result<Vec<SearchEntry>, Box<Error
         config.get_ldap_bind_dn(),
         config.get_ldap_bind_password(),
     );
+
+    if ldap.is_err() {
+        println!("Error: Could not connect to ldap server");
+    }
 
     let mail_field = config.get_ldap_mail_field();
     let fields = vec!["uid", "givenname", "sn", "cn", mail_field.as_str()];
@@ -116,14 +105,25 @@ fn invite_from_ldap(
     config: &config::Config,
     client: &mut bw_admin::Client,
 ) -> Result<(), Box<Error>> {
+    let existing_users = get_existing_users(client)?;
+
     let mail_field = config.get_ldap_mail_field();
+    let mut num_users = 0;
     for ldap_user in search_entries(config)? {
         if let Some(user_email) = ldap_user.attrs[mail_field.as_str()].first() {
-            println!("Try to invite user: {}", user_email);
-            let response = client.invite(user_email);
-            println!("Invite response: {:?}", response);
+            if existing_users.contains(user_email) {
+                println!("User with email already exists: {}", user_email);
+            } else {
+                println!("Try to invite user: {}", user_email);
+                let response = client.invite(user_email);
+                num_users = num_users + 1;
+                println!("Invite response: {:?}", response);
+            }
         }
     }
+
+    // Maybe think about returning this value for some other use
+    println!("Sent invites to {} user(s).", num_users);
 
     Ok(())
 }

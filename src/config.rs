@@ -53,6 +53,8 @@ pub struct Config {
     ldap_mail_field: Option<String>,
     // Interval syncing config
     ldap_sync_interval_seconds: Option<u64>,
+    // Should start background sync loop
+    ldap_sync_loop: Option<bool>,
 }
 
 impl Config {
@@ -138,5 +140,9 @@ impl Config {
 
     pub fn get_ldap_sync_interval_seconds(&self) -> u64 {
         self.ldap_sync_interval_seconds.unwrap_or(60)
+    }
+
+    pub fn get_ldap_sync_loop(&self) -> bool {
+        self.ldap_sync_loop.unwrap_or(true)
     }
 }

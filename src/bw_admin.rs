@@ -9,19 +9,26 @@ use std::time::{Duration, Instant};
 
 const COOKIE_LIFESPAN: Duration = Duration::from_secs(20 * 60);
 
+fn true_val() -> bool {
+    true
+}
+
+#[derive(Debug)]
 #[derive(Deserialize)]
 pub struct User {
-    Email: String,
+    #[serde(rename = "Email")]
+    email: String,
     #[serde(rename = "_Enabled")]
-    Enabled: bool,
+    #[serde(default = "true_val")]
+    enabled: bool,
 }
 
 impl User {
     pub fn get_email(&self) -> String {
-        self.Email.clone()
+        self.email.clone()
     }
     pub fn is_enabled(&self) -> bool {
-        self.Enabled
+        self.enabled
     }
 }
 
@@ -149,6 +156,20 @@ impl Client {
     /// Get all existing users
     pub fn users(&mut self) -> Result<Vec<User>, Box<Error>> {
         let all_users: Vec<User> = self.get("/users").json()?;
+        Ok(all_users)
+    }
+
+    /// Get all invited users
+    pub fn invites(&mut self) -> Result<Vec<User>, Box<Error>> {
+        let all_invites: Vec<User> = self.get("/invites").json()?;
+        Ok(all_invites)
+    }
+
+    /// Get all users and invites
+    pub fn users_and_invites(&mut self) -> Result<Vec<User>, Box<Error>> {
+        let mut all_users = self.users()?;
+        let mut invites = self.invites()?;
+        all_users.append(&mut invites);
         Ok(all_users)
     }
 }

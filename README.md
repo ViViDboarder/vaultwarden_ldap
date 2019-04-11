@@ -23,6 +23,7 @@ Configuration values are as follows:
 |`ldap_search_filter`|String||Filter used when searching LDAP for users. Eg. `(&(objectClass=*)(uid=*))`|
 |`ldap_mail_field`|String|Optional|Field for each user record that contains the email address to use. Defaults to `mail`|
 |`ldap_sync_interval_seconds`|Integer|Optional|Number of seconds to wait between each LDAP request. Defaults to `60`|
+|`ldap_sync_loop`|Boolean|Optional|Indicates whether or not syncing should be polled in a loop or done once. Defaults to `true`|
 
 ## Future
 
