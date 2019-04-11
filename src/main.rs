@@ -1,6 +1,8 @@
 extern crate ldap3;
 
+use std::collections::HashSet;
 use std::error::Error;
+use std::env;
 use std::thread::sleep;
 use std::time::Duration;
 
@@ -9,6 +11,24 @@ use ldap3::{DerefAliases, LdapConn, Scope, SearchEntry, SearchOptions};
 mod bw_admin;
 mod config;
 
+/// Container for args parsed from the command line
+struct ParsedArgs {
+    start_loop: bool,
+}
+
+impl ParsedArgs {
+    pub parse() -> ParsedArgs {
+        let mut parsed_args = ParsedArgs {};
+        for arg in env::args().collect() {
+            if arg == "--loop" {
+                parsed_args.start_loop = true;
+            }
+        }
+
+        parsed_args.clone()
+    }
+}
+
 fn main() {
     let config = config::Config::from_file();
     let mut client = bw_admin::Client::new(
@@ -16,26 +36,38 @@ fn main() {
         config.get_bitwarden_admin_token().clone(),
     );
 
-    match client.users() {
-        Ok(users) => {
-            for user in users {
-                println!("Existing user: {}", user.get_email());
-            }
-        }
-        Err(e) => {
-            println!("Could not get users");
-            panic!("{}", e);
-        }
+    let parsed_args = ParsedArgs::parse();
+    if let Err(e) = invite_users(&config, &mut client, parsed_args.start_loop) {
+        panic!("{}", e);
+    }
+}
+
+/// Invites new users to Bitwarden from LDAP
+fn invite_users(
+    config: &config::Config,
+    client: &mut bw_admin::Client,
+    start_loop: bool,
+) -> Result((), Box<Error>> {
+    let user_emails = get_existing_users(&mut client)?;
+
+    if start_loop {
+        start_sync_loop(&config, &mut client)?;
+    } else {
+        invite_from_ldap(&config, &mut client)?;
     }
 
-    // TODO: Use command line args to differentiate if we invite once or start loop
-    if let Err(e) = invite_from_ldap(&config, &mut client) {
-        println!("{}", e);
+    Ok(())
+}
+
+/// Creates set of email addresses for users that already exist in Bitwarden
+fn get_existing_users(client: &mut bw_admin::Client) -> Result<HashSet<String>, Box<Error>> {
+    let all_users = client.users()?;
+    let mut user_emails = HashSet::with_capacity(all_users.len());
+    for user in client.users()? {
+        user_emails.insert(user.get_email());
     }
 
-    if let Err(e) = start_sync_loop(&config, &mut client) {
-        println!("{}", e);
-    }
+    Ok(user_emails)
 }
 
 /// Creates an LDAP connection, authenticating if necessary
