@@ -41,14 +41,14 @@ fn invite_users(
 
 /// Creates set of email addresses for users that already exist in Bitwarden
 fn get_existing_users(client: &mut bw_admin::Client) -> Result<HashSet<String>, Box<Error>> {
-    let all_users = client.users_and_invites()?;
+    let all_users = client.users()?;
     let mut user_emails = HashSet::with_capacity(all_users.len());
     for user in all_users {
         user_emails.insert(user.get_email());
-        if user.is_enabled() {
-            println!("Existing user or invite found with email: {}", user.get_email());
-        } else {
+        if user.is_disabled() {
             println!("Existing disabled user found with email: {}", user.get_email());
+        } else {
+            println!("Existing user or invite found with email: {}", user.get_email());
         }
     }
 
