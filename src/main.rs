@@ -44,9 +44,15 @@ fn get_existing_users(client: &mut bw_admin::Client) -> Result<HashSet<String>, 
     for user in all_users {
         user_emails.insert(user.get_email());
         if user.is_disabled() {
-            println!("Existing disabled user found with email: {}", user.get_email());
+            println!(
+                "Existing disabled user found with email: {}",
+                user.get_email()
+            );
         } else {
-            println!("Existing user or invite found with email: {}", user.get_email());
+            println!(
+                "Existing user or invite found with email: {}",
+                user.get_email()
+            );
         }
     }
 
@@ -113,7 +119,8 @@ fn invite_from_ldap(
                         println!("User with email already exists: {}", user_email);
                     } else {
                         println!("Try to invite user: {}", user_email);
-                        let response = client.invite(user_email);
+                        // TODO: Validate response
+                        let _response = client.invite(user_email);
                         num_users = num_users + 1;
                         // println!("Invite response: {:?}", response);
                     }
@@ -122,7 +129,7 @@ fn invite_from_ldap(
 
             // Maybe think about returning this value for some other use
             println!("Sent invites to {} user(s).", num_users);
-        },
+        }
         Err(e) => {
             println!("Error: Failed to get existing users from Bitwarden");
             return Err(e);
