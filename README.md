@@ -3,6 +3,12 @@ A simple LDAP connector for [bitwarden_rs](https://github.com/dani-garcia/bitwar
 
 After configuring, simply run `bitwarden_rs_ldap` and it will invite any users it finds in LDAP to your `bitwarden_rs` instance.
 
+## Deploying
+
+This is easiest done using Docker. See the `docker-compose.yml` file in this repo for an example. If you would like to use Docker Hub rather than building, change `build: .` to `image: vividboarder/bitwarden_rs_ldap`.
+
+Make sure to populate and mount your `config.toml`!
+
 ## Configuration
 
 Configuration is read from a TOML file. The default location is `config.toml`, but this can be configured by setting the `CONFIG_PATH` env variable to whatever path you would like.
