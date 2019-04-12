@@ -28,8 +28,6 @@ fn invite_users(
     client: &mut bw_admin::Client,
     start_loop: bool,
 ) -> Result<(), Box<Error>> {
-    // TODO: Better error handling to differentiate failure to connect to Bitwarden vs LDAP
-
     if start_loop {
         start_sync_loop(config, client)?;
     } else {
@@ -74,7 +72,7 @@ fn search_entries(config: &config::Config) -> Result<Vec<SearchEntry>, Box<Error
     );
 
     if ldap.is_err() {
-        println!("Error: Could not connect to ldap server");
+        println!("Error: Could not bind to ldap server");
     }
 
     let mail_field = config.get_ldap_mail_field();
@@ -105,25 +103,31 @@ fn invite_from_ldap(
     config: &config::Config,
     client: &mut bw_admin::Client,
 ) -> Result<(), Box<Error>> {
-    let existing_users = get_existing_users(client)?;
-
-    let mail_field = config.get_ldap_mail_field();
-    let mut num_users = 0;
-    for ldap_user in search_entries(config)? {
-        if let Some(user_email) = ldap_user.attrs[mail_field.as_str()].first() {
-            if existing_users.contains(user_email) {
-                println!("User with email already exists: {}", user_email);
-            } else {
-                println!("Try to invite user: {}", user_email);
-                let response = client.invite(user_email);
-                num_users = num_users + 1;
-                println!("Invite response: {:?}", response);
+    match get_existing_users(client) {
+        Ok(existing_users) => {
+            let mail_field = config.get_ldap_mail_field();
+            let mut num_users = 0;
+            for ldap_user in search_entries(config)? {
+                if let Some(user_email) = ldap_user.attrs[mail_field.as_str()].first() {
+                    if existing_users.contains(user_email) {
+                        println!("User with email already exists: {}", user_email);
+                    } else {
+                        println!("Try to invite user: {}", user_email);
+                        let response = client.invite(user_email);
+                        num_users = num_users + 1;
+                        println!("Invite response: {:?}", response);
+                    }
+                }
             }
+
+            // Maybe think about returning this value for some other use
+            println!("Sent invites to {} user(s).", num_users);
+        },
+        Err(e) => {
+            println!("Error: Failed to get existing users from Bitwarden");
+            return Err(e);
         }
     }
-
-    // Maybe think about returning this value for some other use
-    println!("Sent invites to {} user(s).", num_users);
 
     Ok(())
 }

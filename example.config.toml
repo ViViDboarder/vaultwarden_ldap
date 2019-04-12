@@ -1,0 +1,8 @@
+bitwarden_url = "http://bitwarden:80"
+bitwarden_admin_token = "admin"
+ldap_host = "ldap"
+ldap_bind_dn = "cn=admin,dc=example,dc=org"
+ldap_bind_password = "admin"
+ldap_search_base_dn = "dc=example,dc=org"
+ldap_search_filter = "(&(objectClass=*)(uid=*))"
+ldap_sync_interval_seconds = 10

@@ -2,9 +2,16 @@ version: '3'
 services:
   ldap_sync:
     build: .
+    volumes:
+      - ./example.config.toml:/usr/src/bitwarden_rs_ldap/config.toml:ro
+    restart: always
 
   bitwarden:
-    image: mprasil/bitwarden_rs
+    image: mprasil/bitwarden
+    ports:
+      - 8000:80
+    environment:
+      ADMIN_TOKEN: admin
 
   ldap:
     image: osixia/openldap
