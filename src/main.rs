@@ -115,7 +115,7 @@ fn invite_from_ldap(
                         println!("Try to invite user: {}", user_email);
                         let response = client.invite(user_email);
                         num_users = num_users + 1;
-                        println!("Invite response: {:?}", response);
+                        // println!("Invite response: {:?}", response);
                     }
                 }
             }
