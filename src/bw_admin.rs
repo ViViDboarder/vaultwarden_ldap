@@ -9,8 +9,7 @@ use std::time::{Duration, Instant};
 
 const COOKIE_LIFESPAN: Duration = Duration::from_secs(20 * 60);
 
-#[derive(Debug)]
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct User {
     #[serde(rename = "Email")]
     email: String,
@@ -25,7 +24,7 @@ impl User {
 
     pub fn is_disabled(&self) -> bool {
         // HACK: Magic number
-        self.status != 2
+        self.status == 2
     }
 }
 
