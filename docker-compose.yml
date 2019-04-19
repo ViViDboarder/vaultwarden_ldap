@@ -12,6 +12,8 @@ services:
       - 8000:80
     environment:
       ADMIN_TOKEN: admin
+      SIGNUPS_ALLOWED: 'false'
+      INVITATIONS_ALLOWED: 'true'
 
   ldap:
     image: osixia/openldap
