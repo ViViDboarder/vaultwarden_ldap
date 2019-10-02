@@ -31,6 +31,35 @@ Configuration values are as follows:
 |`ldap_sync_interval_seconds`|Integer|Optional|Number of seconds to wait between each LDAP request. Defaults to `60`|
 |`ldap_sync_loop`|Boolean|Optional|Indicates whether or not syncing should be polled in a loop or done once. Defaults to `true`|
 
+## Testing
+
+All testing is manual right now. First step is to set up Bitwarden and the LDAP server.
+
+```bash
+docker-compose up -d bitwarden ldap ldap_admin
+```
+
+1. After that, open the admin portal on http://localhost:8001 and log in using the default account info:
+
+    Username: cn=admin,dc=example,dc=org
+    Password: admin
+
+From there you can set up your test group and users.
+
+2. Expand the `dc=example,dc=org` nav tree and select "Create new entry here"
+3. Select "Generic: Posix Group"
+4. Give it a name, eg. "Users" and then save and commit
+5. Select "Create child object"
+6. Select "Generic: User Account"
+7. Give the user a name and select a group ID number and save and commit
+8. Select "Add new attribute" and select "Email" and then add a test email address
+
+9. Run the ldap sync
+
+```bash
+docker-compose up ldap_sync
+```
+
 ## Future
 
 * Any kind of proper logging

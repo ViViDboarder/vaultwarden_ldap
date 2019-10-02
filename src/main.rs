@@ -114,7 +114,12 @@ fn invite_from_ldap(
             let mail_field = config.get_ldap_mail_field();
             let mut num_users = 0;
             for ldap_user in search_entries(config)? {
-                if let Some(user_email) = ldap_user.attrs[mail_field.as_str()].first() {
+                // Safely get first email from list of emails in field
+                if let Some(user_email) = ldap_user
+                    .attrs
+                    .get(mail_field.as_str())
+                    .and_then(|l| (l.first()))
+                {
                     if existing_users.contains(user_email) {
                         println!("User with email already exists: {}", user_email);
                     } else {
@@ -124,6 +129,8 @@ fn invite_from_ldap(
                         num_users = num_users + 1;
                         // println!("Invite response: {:?}", response);
                     }
+                } else {
+                    println!("Warning: Email field, {:?}, not found on user", mail_field);
                 }
             }
 
