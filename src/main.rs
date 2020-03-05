@@ -42,7 +42,7 @@ fn get_existing_users(client: &mut bw_admin::Client) -> Result<HashSet<String>, 
     let all_users = client.users()?;
     let mut user_emails = HashSet::with_capacity(all_users.len());
     for user in all_users {
-        user_emails.insert(user.get_email());
+        user_emails.insert(user.get_email().to_lowercase());
         if user.is_disabled() {
             println!(
                 "Existing disabled user found with email: {}",
@@ -124,7 +124,7 @@ fn invite_from_ldap(
                     .get(mail_field.as_str())
                     .and_then(|l| (l.first()))
                 {
-                    if existing_users.contains(user_email) {
+                    if existing_users.contains(&user_email.to_lowercase()) {
                         println!("User with email already exists: {}", user_email);
                     } else {
                         println!("Try to invite user: {}", user_email);
