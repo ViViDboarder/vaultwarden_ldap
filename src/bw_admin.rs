@@ -150,7 +150,7 @@ impl Client {
     }
 
     /// Get all existing users
-    pub fn users(&mut self) -> Result<Vec<User>, Box<Error>> {
+    pub fn users(&mut self) -> Result<Vec<User>, Box<dyn Error>> {
         let all_users: Vec<User> = self.get("/users").json()?;
         Ok(all_users)
     }

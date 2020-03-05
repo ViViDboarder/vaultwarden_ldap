@@ -27,7 +27,7 @@ fn invite_users(
     config: &config::Config,
     client: &mut bw_admin::Client,
     start_loop: bool,
-) -> Result<(), Box<Error>> {
+) -> Result<(), Box<dyn Error>> {
     if start_loop {
         start_sync_loop(config, client)?;
     } else {
@@ -38,7 +38,7 @@ fn invite_users(
 }
 
 /// Creates set of email addresses for users that already exist in Bitwarden
-fn get_existing_users(client: &mut bw_admin::Client) -> Result<HashSet<String>, Box<Error>> {
+fn get_existing_users(client: &mut bw_admin::Client) -> Result<HashSet<String>, Box<dyn Error>> {
     let all_users = client.users()?;
     let mut user_emails = HashSet::with_capacity(all_users.len());
     for user in all_users {
@@ -60,7 +60,11 @@ fn get_existing_users(client: &mut bw_admin::Client) -> Result<HashSet<String>, 
 }
 
 /// Creates an LDAP connection, authenticating if necessary
-fn ldap_client(ldap_url: String, bind_dn: String, bind_pw: String) -> Result<LdapConn, Box<Error>> {
+fn ldap_client(
+    ldap_url: String,
+    bind_dn: String,
+    bind_pw: String,
+) -> Result<LdapConn, Box<dyn Error>> {
     let ldap = LdapConn::new(ldap_url.as_str())?;
     match ldap.simple_bind(bind_dn.as_str(), bind_pw.as_str()) {
         _ => {}
@@ -70,7 +74,7 @@ fn ldap_client(ldap_url: String, bind_dn: String, bind_pw: String) -> Result<Lda
 }
 
 /// Retrieves search results from ldap
-fn search_entries(config: &config::Config) -> Result<Vec<SearchEntry>, Box<Error>> {
+fn search_entries(config: &config::Config) -> Result<Vec<SearchEntry>, Box<dyn Error>> {
     let ldap = ldap_client(
         config.get_ldap_url(),
         config.get_ldap_bind_dn(),
@@ -108,7 +112,7 @@ fn search_entries(config: &config::Config) -> Result<Vec<SearchEntry>, Box<Error
 fn invite_from_ldap(
     config: &config::Config,
     client: &mut bw_admin::Client,
-) -> Result<(), Box<Error>> {
+) -> Result<(), Box<dyn Error>> {
     match get_existing_users(client) {
         Ok(existing_users) => {
             let mail_field = config.get_ldap_mail_field();
@@ -150,7 +154,7 @@ fn invite_from_ldap(
 fn start_sync_loop(
     config: &config::Config,
     client: &mut bw_admin::Client,
-) -> Result<(), Box<Error>> {
+) -> Result<(), Box<dyn Error>> {
     let interval = Duration::from_secs(config.get_ldap_sync_interval_seconds());
     loop {
         invite_from_ldap(config, client)?;
