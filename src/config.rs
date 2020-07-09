@@ -44,6 +44,8 @@ pub struct Config {
     ldap_scheme: Option<String>,
     ldap_ssl: Option<bool>,
     ldap_port: Option<u16>,
+	// LDAP skip tls verify
+    ldap_no_tls_verify: Option<bool>,
     // LDAP auth config
     ldap_bind_dn: String,
     ldap_bind_password: Pass,
@@ -107,6 +109,10 @@ impl Config {
 
     pub fn get_ldap_ssl(&self) -> bool {
         self.ldap_ssl.unwrap_or(false)
+    }
+
+    pub fn get_ldap_no_tls_verify(&self) -> bool {
+        self.ldap_no_tls_verify.unwrap_or(false)
     }
 
     pub fn get_ldap_port(&self) -> u16 {

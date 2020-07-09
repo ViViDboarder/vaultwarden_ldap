@@ -23,6 +23,7 @@ Configuration values are as follows:
 |`ldap_host`|String||The hostname or IP address for your ldap server|
 |`ldap_scheme`|String|Optional|The that should be used to connect. `ldap` or `ldaps`. This is set by default based on SSL settings|
 |`ldap_ssl`|Boolean|Optional|Indicates if SSL should be used. Defaults to `false`|
+|`ldap_no_tls_verify`|Boolean|Optional|Indicates if certificate should be verified when using SSL. Defaults to `true`|
 |`ldap_port`|Integer|Optional|Port used to connect to the LDAP server. This will default to 389 or 636, depending on your SSL settings|
 |`ldap_bind_dn`|String||The dn for the bind user that will connect to LDAP. Eg. `cn=admin,dc=example,dc=org`|
 |`ldap_bind_password`|String||The password for the provided bind user.|
