@@ -6,6 +6,8 @@ use serde::Deserialize;
 use std::collections::HashMap;
 use std::error::Error;
 use std::time::{Duration, Instant};
+use std::fs::File;
+use std::io::Read;
 
 const COOKIE_LIFESPAN: Duration = Duration::from_secs(20 * 60);
 
@@ -31,29 +33,50 @@ impl User {
 pub struct Client {
     url: String,
     admin_token: String,
-    cookie: Option<String>,
-    cookie_created: Option<Instant>,
+    root_cert: String,
+	cookie: Option<String>,
+    cookie_created: Option<Instant>
 }
 
 impl Client {
     /// Create new instance of client
-    pub fn new(url: String, admin_token: String) -> Client {
+    pub fn new(url: String, admin_token: String, root_cert: String) -> Client {
         Client {
             url,
             admin_token,
-            cookie: None,
-            cookie_created: None,
+            root_cert,
+			cookie: None,
+            cookie_created: None
         }
+    }
+
+    fn get_http_client(&self) -> reqwest::Client {
+
+        let mut client = reqwest::Client::builder()
+            .redirect(reqwest::RedirectPolicy::none());
+
+        if !&self.root_cert.is_empty() {
+            
+            let mut buf = Vec::new();
+
+            // read a local binary DER encoded certificate
+            File::open(&self.root_cert).expect("cannot open root cert").read_to_end(&mut buf).expect("cannot read root cert");
+
+            // create a certificate
+            let cert = reqwest::Certificate::from_der(&buf).expect("could not load der certificate");
+
+			// add the root cert
+            client = client.add_root_certificate(cert);
+        }
+
+        return client.build().unwrap();
     }
 
     /// Authenticate client
     fn auth(&mut self) -> Response {
+
         let cookie_created = Instant::now();
-        let client = reqwest::Client::builder()
-            // Avoid redirects because server will redirect to admin page after auth
-            .redirect(reqwest::RedirectPolicy::none())
-            .build()
-            .unwrap();
+        let client = &self.get_http_client();
         let result = client
             .post(format!("{}{}", &self.url, "/admin/").as_str())
             .form(&[("token", &self.admin_token)])
@@ -102,8 +125,8 @@ impl Client {
             }
             Some(cookie) => {
                 let url = format!("{}/admin{}", &self.url, path);
-                let request = reqwest::Client::new()
-                    .get(url.as_str())
+                let client = self.get_http_client();
+                let request = client.get(url.as_str())
                     .header(reqwest::header::COOKIE, cookie.clone());
                 let response = request.send().unwrap_or_else(|e| {
                     panic!("Could not call with {}. {:?}", url, e);
@@ -126,8 +149,8 @@ impl Client {
             }
             Some(cookie) => {
                 let url = format!("{}/admin{}", &self.url, path);
-                let request = reqwest::Client::new()
-                    .post(url.as_str())
+                let client = self.get_http_client();
+                let request = client.post(url.as_str())
                     .header("Cookie", cookie.clone())
                     .json(&json);
                 let response = request.send().unwrap_or_else(|e| {
