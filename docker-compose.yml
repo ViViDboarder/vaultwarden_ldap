@@ -6,6 +6,7 @@ services:
       # dockerfile: Dockerfile.alpine
     volumes:
       - ./example.config.toml:/usr/src/bitwarden_rs_ldap/config.toml:ro
+      # ./root.cert:/usr/src/bitwarden_rs_ldap/root.cert:ro
     environment:
       RUST_BACKTRACE: 1
     restart: always

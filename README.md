@@ -19,7 +19,7 @@ Configuration values are as follows:
 |----|----|--------|-----------|
 |`bitwarden_url`|String||The root URL for accessing `bitwarden_rs`. Eg: `https://bw.example.com`|
 |`bitwarden_admin_token`|String||The value passed as `ADMIN_TOKEN` to `bitwarden_rs`|
-|`bitwarden_root_cert`|String|Optional|Additional der-encoded root certificate to trust for accessing `bitwarden_rs`|
+|`bitwarden_root_cert`|String|Optional|Path to an additional der-encoded root certificate to trust. Eg. `root.cert`. If using Docker see `docker-compose.yml` for how to expose it. Defaults to `empty`|
 |`ldap_host`|String||The hostname or IP address for your ldap server|
 |`ldap_scheme`|String|Optional|The that should be used to connect. `ldap` or `ldaps`. This is set by default based on SSL settings|
 |`ldap_ssl`|Boolean|Optional|Indicates if SSL should be used. Defaults to `false`|
