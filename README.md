@@ -1,7 +1,7 @@
 # bitwarden_rs_ldap
 A simple LDAP connector for [bitwarden_rs](https://github.com/dani-garcia/bitwarden_rs)
 
-After configuring, simply run `bitwarden_rs_ldap` and it will invite any users it finds in LDAP to your `bitwarden_rs` instance.
+After configuring, run `bitwarden_rs_ldap` and it will invite any users it finds in LDAP to your `bitwarden_rs` instance.
 
 ## Deploying
 
@@ -30,6 +30,12 @@ Configuration values are as follows:
 |`ldap_mail_field`|String|Optional|Field for each user record that contains the email address to use. Defaults to `mail`|
 |`ldap_sync_interval_seconds`|Integer|Optional|Number of seconds to wait between each LDAP request. Defaults to `60`|
 |`ldap_sync_loop`|Boolean|Optional|Indicates whether or not syncing should be polled in a loop or done once. Defaults to `true`|
+
+## Development
+
+This repo has a predefined set of [pre-commit](https://pre-commit.com) rules. You can install pre-commit via any means you'd like. Once your system has `pre-commit` installed, you can run `make install-hooks` to ensure the hooks will run with every commit. You can also force running all hooks with `make check`.
+
+For those less familiar with `cargo`, you can use the `make` targets that have been included for common tasks like running a debug version. `make run-debug` or building a release version `make release`.
 
 ## Testing
 

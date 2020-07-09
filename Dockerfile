@@ -5,15 +5,13 @@ RUN USER=root cargo new --bin bitwarden_rs_ldap
 WORKDIR /usr/src/bitwarden_rs_ldap
 
 # Compile dependencies
-COPY ./Cargo.toml ./Cargo.toml
-COPY ./Cargo.lock ./Cargo.lock
-RUN cargo build --release
-# Remove temp src
-RUN rm src/*.rs
+COPY Cargo.toml Cargo.lock ./
+RUN cargo build --locked --release
 
-# Copy source and install
-COPY ./src ./src
+# Remove bins to make sure we rebuild
 RUN rm ./target/release/deps/bitwarden_rs_ldap*
+# Copy source and install
+COPY src ./src
 RUN cargo install --path .
 
 CMD ["bitwarden_rs_ldap"]
