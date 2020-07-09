@@ -15,6 +15,7 @@ fn main() {
     let mut client = bw_admin::Client::new(
         config.get_bitwarden_url().clone(),
         config.get_bitwarden_admin_token().clone(),
+        config.get_bitwarden_root_cert().clone()
     );
 
     if let Err(e) = invite_users(&config, &mut client, config.get_ldap_sync_loop()) {
