@@ -38,13 +38,12 @@ pub struct Config {
     // Bitwarden connection config
     bitwarden_url: String,
     bitwarden_admin_token: String,
-    bitwarden_root_cert: Option<String>,
+    bitwarden_root_cert_file: Option<String>,
     // LDAP Connection config
     ldap_host: String,
     ldap_scheme: Option<String>,
     ldap_ssl: Option<bool>,
     ldap_port: Option<u16>,
-	// LDAP skip tls verify
     ldap_no_tls_verify: Option<bool>,
     // LDAP auth config
     ldap_bind_dn: String,
@@ -74,9 +73,9 @@ impl Config {
         self.bitwarden_admin_token.clone()
     }
 
-    pub fn get_bitwarden_root_cert(&self) -> String {
-		match &self.bitwarden_root_cert {
-            Some(bitwarden_root_cert) => bitwarden_root_cert.clone(),
+    pub fn get_bitwarden_root_cert_file(&self) -> String {
+        match &self.bitwarden_root_cert_file {
+            Some(bitwarden_root_cert_file) => bitwarden_root_cert_file.clone(),
             None => String::new(),
         }
     }
