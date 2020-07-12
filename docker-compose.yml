@@ -13,7 +13,7 @@ services:
     restart: always
 
   bitwarden:
-    image: mprasil/bitwarden
+    image: bitwardenrs/server
     ports:
       - 8000:80
     environment:
