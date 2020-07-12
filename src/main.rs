@@ -5,7 +5,7 @@ use std::error::Error;
 use std::thread::sleep;
 use std::time::Duration;
 
-use ldap3::{DerefAliases, LdapConn, Scope, SearchEntry, SearchOptions};
+use ldap3::{DerefAliases, LdapConn, LdapConnSettings, Scope, SearchEntry, SearchOptions};
 
 mod bw_admin;
 mod config;
@@ -15,6 +15,7 @@ fn main() {
     let mut client = bw_admin::Client::new(
         config.get_bitwarden_url().clone(),
         config.get_bitwarden_admin_token().clone(),
+        config.get_bitwarden_root_cert_file().clone(),
     );
 
     if let Err(e) = invite_users(&config, &mut client, config.get_ldap_sync_loop()) {
@@ -64,8 +65,10 @@ fn ldap_client(
     ldap_url: String,
     bind_dn: String,
     bind_pw: String,
+    no_tls_verify: bool,
 ) -> Result<LdapConn, Box<dyn Error>> {
-    let ldap = LdapConn::new(ldap_url.as_str())?;
+    let settings = LdapConnSettings::new().set_no_tls_verify(no_tls_verify);
+    let ldap = LdapConn::with_settings(settings, ldap_url.as_str())?;
     match ldap.simple_bind(bind_dn.as_str(), bind_pw.as_str()) {
         _ => {}
     };
@@ -79,6 +82,7 @@ fn search_entries(config: &config::Config) -> Result<Vec<SearchEntry>, Box<dyn E
         config.get_ldap_url(),
         config.get_ldap_bind_dn(),
         config.get_ldap_bind_password(),
+        config.get_ldap_no_tls_verify(),
     );
 
     if ldap.is_err() {
