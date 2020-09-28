@@ -52,3 +52,7 @@ clean:
 .PHONY: docker-build
 docker-build:
 	docker build -f ./Dockerfile -t $(DOCKER_TAG) .
+
+.PHONY: docker-build-alpine
+docker-build-alpine:
+	docker build -f ./Dockerfile.alpine -t $(DOCKER_TAG):alpine .

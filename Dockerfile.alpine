@@ -1,18 +1,17 @@
-FROM ekidd/rust-musl-builder:1.33.0 AS builder
+FROM ekidd/rust-musl-builder:1.46.0 AS builder
 
+# Cache build deps
 RUN USER=rust cargo init
-
-COPY ./Cargo.toml ./Cargo.toml
-COPY ./Cargo.lock ./Cargo.lock
-RUN cargo build --release
+COPY Cargo.toml Cargo.lock ./
+RUN cargo build --locked --release
 
 # Remove temp src
 RUN rm src/*.rs
-COPY ./src ./src
-# Fix permissions on source
-RUN USER=root chown -R rust:rust /home/rust/src/src
-
+# Remove bins to make sure we rebuild
+# RUN rm ./target/release/deps/bitwarden_rs_ldap*
+COPY --chown=rust:rust ./src ./src
 RUN touch ./src/main.rs
+
 RUN cargo build --release
 
 FROM alpine:3

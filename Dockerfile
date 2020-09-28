@@ -1,4 +1,4 @@
-FROM rust:1.33
+FROM rust:1.46
 
 WORKDIR /usr/src/
 RUN USER=root cargo new --bin bitwarden_rs_ldap
