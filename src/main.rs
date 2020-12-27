@@ -66,8 +66,11 @@ fn ldap_client(
     bind_dn: String,
     bind_pw: String,
     no_tls_verify: bool,
+    starttls: bool,
 ) -> Result<LdapConn, Box<dyn Error>> {
-    let settings = LdapConnSettings::new().set_no_tls_verify(no_tls_verify);
+    let settings = LdapConnSettings::new()
+        .set_starttls(starttls)
+        .set_no_tls_verify(no_tls_verify);
     let ldap = LdapConn::with_settings(settings, ldap_url.as_str())?;
     match ldap.simple_bind(bind_dn.as_str(), bind_pw.as_str()) {
         _ => {}
@@ -83,6 +86,7 @@ fn search_entries(config: &config::Config) -> Result<Vec<SearchEntry>, Box<dyn E
         config.get_ldap_bind_dn(),
         config.get_ldap_bind_password(),
         config.get_ldap_no_tls_verify(),
+        config.get_ldap_starttls(),
     );
 
     if ldap.is_err() {
