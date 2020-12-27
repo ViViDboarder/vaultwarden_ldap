@@ -22,7 +22,8 @@ Configuration values are as follows:
 |`bitwarden_root_cert_file`|String|Optional|Path to an additional der-encoded root certificate to trust. Eg. `root.cert`. If using Docker see `docker-compose.yml` for how to expose it. Defaults to `empty`|
 |`ldap_host`|String||The hostname or IP address for your ldap server|
 |`ldap_scheme`|String|Optional|The that should be used to connect. `ldap` or `ldaps`. This is set by default based on SSL settings|
-|`ldap_ssl`|Boolean|Optional|Indicates if SSL should be used. Defaults to `false`|
+|`ldap_ssl`|Boolean|Optional|Indicates if SSL should be used and if we should connect with `ldaps`. Defaults to `false`|
+|`ldap_starttls`|Boolean|Optional|Indicates if the connection should be done using StartTLS|
 |`ldap_no_tls_verify`|Boolean|Optional|Indicates if certificate should be verified when using SSL. Defaults to `true`|
 |`ldap_port`|Integer|Optional|Port used to connect to the LDAP server. This will default to 389 or 636, depending on your SSL settings|
 |`ldap_bind_dn`|String||The dn for the bind user that will connect to LDAP. Eg. `cn=admin,dc=example,dc=org`|
