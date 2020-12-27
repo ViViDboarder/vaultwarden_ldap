@@ -43,6 +43,7 @@ pub struct Config {
     ldap_host: String,
     ldap_scheme: Option<String>,
     ldap_ssl: Option<bool>,
+    ldap_starttls: Option<bool>,
     ldap_port: Option<u16>,
     ldap_no_tls_verify: Option<bool>,
     // LDAP auth config
@@ -108,6 +109,10 @@ impl Config {
 
     pub fn get_ldap_ssl(&self) -> bool {
         self.ldap_ssl.unwrap_or(false)
+    }
+
+    pub fn get_ldap_starttls(&self) -> bool {
+        self.ldap_starttls.unwrap_or(false)
     }
 
     pub fn get_ldap_no_tls_verify(&self) -> bool {
