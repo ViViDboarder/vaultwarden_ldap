@@ -1,7 +1,7 @@
 ---
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.1.0
+    rev: v3.4.0
     hooks:
       - id: check-added-large-files
       - id: check-yaml
@@ -10,7 +10,7 @@ repos:
       - id: end-of-file-fixer
       - id: check-merge-conflict
   - repo: https://github.com/doublify/pre-commit-rust
-    rev: 14b3e118cfc36fb87d8d9cbd1305a2238fd85868
+    rev: v1.0
     hooks:
       - id: fmt
       - id: cargo-check
