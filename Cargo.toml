@@ -1,6 +1,6 @@
 [package]
 name = "vaultwarden_ldap"
-version = "0.3.1"
+version = "0.4.0"
 authors = ["ViViDboarder <vividboarder@gmail.com>"]
 edition = "2018"
 
