@@ -7,15 +7,15 @@ use std::time::Duration;
 
 use ldap3::{DerefAliases, LdapConn, LdapConnSettings, Scope, SearchEntry, SearchOptions};
 
-mod bw_admin;
 mod config;
+mod vw_admin;
 
 fn main() {
     let config = config::Config::from_file();
-    let mut client = bw_admin::Client::new(
-        config.get_bitwarden_url().clone(),
-        config.get_bitwarden_admin_token().clone(),
-        config.get_bitwarden_root_cert_file().clone(),
+    let mut client = vw_admin::Client::new(
+        config.get_vaultwarden_url().clone(),
+        config.get_vaultwarden_admin_token().clone(),
+        config.get_vaultwarden_root_cert_file().clone(),
     );
 
     if let Err(e) = invite_users(&config, &mut client, config.get_ldap_sync_loop()) {
@@ -26,7 +26,7 @@ fn main() {
 /// Invites new users to Bitwarden from LDAP
 fn invite_users(
     config: &config::Config,
-    client: &mut bw_admin::Client,
+    client: &mut vw_admin::Client,
     start_loop: bool,
 ) -> Result<(), Box<dyn Error>> {
     if start_loop {
@@ -39,7 +39,7 @@ fn invite_users(
 }
 
 /// Creates set of email addresses for users that already exist in Bitwarden
-fn get_existing_users(client: &mut bw_admin::Client) -> Result<HashSet<String>, Box<dyn Error>> {
+fn get_existing_users(client: &mut vw_admin::Client) -> Result<HashSet<String>, Box<dyn Error>> {
     let all_users = client.users()?;
     let mut user_emails = HashSet::with_capacity(all_users.len());
     for user in all_users {
@@ -119,7 +119,7 @@ fn search_entries(config: &config::Config) -> Result<Vec<SearchEntry>, Box<dyn E
 /// Invite all LDAP users to Bitwarden
 fn invite_from_ldap(
     config: &config::Config,
-    client: &mut bw_admin::Client,
+    client: &mut vw_admin::Client,
 ) -> Result<(), Box<dyn Error>> {
     match get_existing_users(client) {
         Ok(existing_users) => {
@@ -161,7 +161,7 @@ fn invite_from_ldap(
 /// Begin sync loop to invite LDAP users to Bitwarden
 fn start_sync_loop(
     config: &config::Config,
-    client: &mut bw_admin::Client,
+    client: &mut vw_admin::Client,
 ) -> Result<(), Box<dyn Error>> {
     let interval = Duration::from_secs(config.get_ldap_sync_interval_seconds());
     loop {

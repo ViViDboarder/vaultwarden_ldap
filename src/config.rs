@@ -36,9 +36,9 @@ pub fn read_config() -> Config {
 /// Contains all config values for LDAP syncing
 pub struct Config {
     // Bitwarden connection config
-    bitwarden_url: String,
-    bitwarden_admin_token: String,
-    bitwarden_root_cert_file: Option<String>,
+    vaultwarden_url: String,
+    vaultwarden_admin_token: String,
+    vaultwarden_root_cert_file: Option<String>,
     // LDAP Connection config
     ldap_host: String,
     ldap_scheme: Option<String>,
@@ -66,17 +66,17 @@ impl Config {
         read_config()
     }
 
-    pub fn get_bitwarden_url(&self) -> String {
-        self.bitwarden_url.clone()
+    pub fn get_vaultwarden_url(&self) -> String {
+        self.vaultwarden_url.clone()
     }
 
-    pub fn get_bitwarden_admin_token(&self) -> String {
-        self.bitwarden_admin_token.clone()
+    pub fn get_vaultwarden_admin_token(&self) -> String {
+        self.vaultwarden_admin_token.clone()
     }
 
-    pub fn get_bitwarden_root_cert_file(&self) -> String {
-        match &self.bitwarden_root_cert_file {
-            Some(bitwarden_root_cert_file) => bitwarden_root_cert_file.clone(),
+    pub fn get_vaultwarden_root_cert_file(&self) -> String {
+        match &self.vaultwarden_root_cert_file {
+            Some(vaultwarden_root_cert_file) => vaultwarden_root_cert_file.clone(),
             None => String::new(),
         }
     }

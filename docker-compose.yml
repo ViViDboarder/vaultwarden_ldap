@@ -7,14 +7,17 @@ services:
       dockerfile: Dockerfile.alpine
     volumes:
       - ./example.config.toml:/config.toml:ro
-      # ./root.cert:/usr/src/bitwarden_rs_ldap/root.cert:ro
+      # ./root.cert:/usr/src/vaultwarden_ldap/root.cert:ro
     environment:
       CONFIG_PATH: /config.toml
       RUST_BACKTRACE: 1
+    depends_on:
+      - vaultwarden
+      - ldap
     restart: always
 
-  bitwarden:
-    image: bitwardenrs/server
+  vaultwarden:
+    image: vaultwarden/server
     ports:
       - 8000:80
     environment:
@@ -42,3 +45,5 @@ services:
     environment:
       PHPLDAPADMIN_HTTPS: 'false'
       PHPLDAPADMIN_LDAP_HOSTS: ldap
+    depends_on:
+      - ldap

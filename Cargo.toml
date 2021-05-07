@@ -1,5 +1,5 @@
 [package]
-name = "bitwarden_rs_ldap"
+name = "vaultwarden_ldap"
 version = "0.3.1"
 authors = ["ViViDboarder <vividboarder@gmail.com>"]
 edition = "2018"

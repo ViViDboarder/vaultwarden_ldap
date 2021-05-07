@@ -1,5 +1,5 @@
-bitwarden_url = "http://bitwarden:80"
-bitwarden_admin_token = "admin"
+vaultwarden_url = "http://vaultwarden:80"
+vaultwarden_admin_token = "admin"
 ldap_host = "ldap"
 ldap_bind_dn = "cn=admin,dc=example,dc=org"
 ldap_bind_password = "admin"

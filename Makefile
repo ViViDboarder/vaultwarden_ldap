@@ -1,4 +1,4 @@
-DOCKER_TAG ?= bitwarden_rs_ldap_${USER}
+DOCKER_TAG ?= vaultwarden_ldap_${USER}
 
 .PHONY: all
 all: test check release
@@ -7,23 +7,23 @@ all: test check release
 .DEFAULT_GOAL = test
 
 # Build debug version
-target/debug/bitwarden_rs_ldap: src/
+target/debug/vaultwarden_ldap: src/
 	cargo build
 
 # Build release version
-target/release/bitwarden_rs_ldap: src/
+target/release/vaultwarden_ldap: src/
 	cargo build --locked --release
 
 .PHONY: debug
-debug: target/debug/bitwarden_rs_ldap
+debug: target/debug/vaultwarden_ldap
 
 .PHONY: release
-release: target/release/bitwarden_rs_ldap
+release: target/release/vaultwarden_ldap
 
 # Run debug version
 .PHONY: run-debug
-run-debug: target/debug/bitwarden_rs_ldap
-	target/debug/bitwarden_rs_ldap
+run-debug: target/debug/vaultwarden_ldap
+	target/debug/vaultwarden_ldap
 
 # Run all tests
 .PHONY: test
