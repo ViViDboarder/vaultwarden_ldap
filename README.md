@@ -71,7 +71,7 @@ docker-compose up ldap_sync
 
 Alternately, you can bootstrap some of this by running:
 
-    docker-compose -f docker-compose.yml -f itest/docker-compose.itest.yml up
+    docker-compose -f docker-compose.yml -f itest/docker-compose.itest.yml up --build
 
 ## Future
 
