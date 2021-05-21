@@ -69,6 +69,10 @@ From there you can set up your test group and users.
 docker-compose up ldap_sync
 ```
 
+Alternately, you can bootstrap some of this by running:
+
+    docker-compose -f docker-compose.yml -f itest/docker-compose.itest.yml up
+
 ## Future
 
 * Any kind of proper logging

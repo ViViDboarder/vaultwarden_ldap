@@ -1,0 +1,11 @@
+---
+version: '3'
+services:
+  ldap_sync:
+
+  vaultwarden:
+
+  ldap:
+    command: ["--copy-service"]
+    volumes:
+      - ./itest/50-seed-user.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/50-seed-user.ldif

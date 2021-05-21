@@ -49,6 +49,9 @@ check-version:
 clean:
 	rm -f ./target
 
+.PHONY: docker-build-all
+docker-build-all: docker-build docker-build-alpine
+
 .PHONY: docker-build
 docker-build:
 	docker build -f ./Dockerfile -t $(DOCKER_TAG) .

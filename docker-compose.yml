@@ -27,9 +27,6 @@ services:
 
   ldap:
     image: osixia/openldap
-    ports:
-      - 389:389
-      - 636:636
     volumes:
       - /var/lib/ldap
       - /etc/ldap/slapd.d
