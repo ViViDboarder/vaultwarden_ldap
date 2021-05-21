@@ -142,7 +142,11 @@ fn invite_from_ldap(
                         // println!("Invite response: {:?}", response);
                     }
                 } else {
-                    println!("Warning: Email field, {:?}, not found on user", mail_field);
+                    match ldap_user.attrs.get("uid").and_then(|l| l.first()) {
+                        Some(user_uid) =>
+                            println!("Warning: Email field, {:?}, not found on user {}", mail_field, user_uid),
+                        None => println!("Warning: Email field, {:?}, not found on user", mail_field)
+                    }
                 }
             }
 
