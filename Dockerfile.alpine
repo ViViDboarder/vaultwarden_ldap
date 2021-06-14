@@ -1,18 +1,16 @@
 FROM ekidd/rust-musl-builder:1.46.0 AS builder
 
+WORKDIR /home/rust/src
+
 # Cache build deps
 RUN USER=rust cargo init
 COPY Cargo.toml Cargo.lock ./
-RUN cargo build --locked --release
+RUN cargo build --locked --release && \
+        rm src/*.rs
 
-# Remove temp src
-RUN rm src/*.rs
-# Remove bins to make sure we rebuild
-# RUN rm ./target/release/deps/vaultwarden_ldap*
 COPY --chown=rust:rust ./src ./src
-RUN touch ./src/main.rs
-
-RUN cargo build --release
+RUN touch ./src/main.rs && \
+        cargo build --release
 
 FROM alpine:3
 RUN apk --no-cache add ca-certificates=20191127-r5
