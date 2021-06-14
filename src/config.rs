@@ -151,7 +151,7 @@ impl Config {
     pub fn get_ldap_mail_field(&self) -> String {
         match &self.ldap_mail_field {
             Some(mail_field) => mail_field.clone(),
-            None => String::from("mail").clone(),
+            None => String::from("mail"),
         }
     }
 

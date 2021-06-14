@@ -1,15 +1,25 @@
 extern crate reqwest;
 extern crate serde;
+extern crate thiserror;
 
 use reqwest::Response;
 use serde::Deserialize;
 use std::collections::HashMap;
-use std::error::Error;
 use std::fs::File;
 use std::io::Read;
 use std::time::{Duration, Instant};
+use thiserror::Error;
 
 const COOKIE_LIFESPAN: Duration = Duration::from_secs(20 * 60);
+
+#[derive(Error, Debug)]
+pub enum ResponseError {
+    #[error("vaultwarden error {0}")]
+    ApiError(String),
+
+    #[error("http error making request {0:?}")]
+    HttpError(#[from] reqwest::Error),
+}
 
 #[derive(Debug, Deserialize)]
 pub struct User {
@@ -59,7 +69,7 @@ impl Client {
             .read_to_end(&mut buf)
             .expect("Could not read root cert file");
 
-        return reqwest::Certificate::from_der(&buf).expect("Could not load der root cert file");
+        reqwest::Certificate::from_der(&buf).expect("Could not load DER root cert file")
     }
 
     fn get_http_client(&self) -> reqwest::Client {
@@ -70,104 +80,97 @@ impl Client {
             client = client.add_root_certificate(cert);
         }
 
-        return client.build().unwrap();
+        client.build().expect("Failed to build http client")
     }
 
     /// Authenticate client
-    fn auth(&mut self) -> Response {
+    fn auth(&mut self) -> Result<Response, ResponseError> {
         let cookie_created = Instant::now();
         let client = self.get_http_client();
         let result = client
             .post(format!("{}{}", &self.url, "/admin/").as_str())
             .form(&[("token", &self.admin_token)])
-            .send()
-            .unwrap_or_else(|e| {
-                panic!("Could not authenticate with {}. {:?}", &self.url, e);
-            });
+            .send()?
+            .error_for_status()?;
 
-        // TODO: Handle error statuses
+        let cookie = result
+            .headers()
+            .get(reqwest::header::SET_COOKIE)
+            .ok_or_else(|| {
+                ResponseError::ApiError(String::from("Could not read authentication cookie"))
+            })?;
 
-        if let Some(cookie) = result.headers().get(reqwest::header::SET_COOKIE) {
-            self.cookie = cookie.to_str().map(|s| String::from(s)).ok();
-            self.cookie_created = Some(cookie_created);
-        } else {
-            panic!("Could not authenticate.")
+        self.cookie = cookie.to_str().map(String::from).ok();
+        self.cookie_created = Some(cookie_created);
+
+        Ok(result)
+    }
+
+    fn cookie_expired(&self) -> bool {
+        match &self.cookie {
+            Some(_) => self
+                .cookie_created
+                .map_or(true, |created| (created.elapsed() >= COOKIE_LIFESPAN)),
+            None => true,
         }
-
-        result
     }
 
     /// Ensure that the client has a current auth cookie
-    fn ensure_auth(&mut self) {
-        match &self.cookie {
-            Some(_) => {
-                if self
-                    .cookie_created
-                    .map_or(true, |created| (created.elapsed() >= COOKIE_LIFESPAN))
-                {
-                    self.auth();
-                }
-            }
-            None => {
-                self.auth();
-            }
-        };
-        // TODO: handle errors
+    fn ensure_auth(&mut self) -> Result<(), ResponseError> {
+        if self.cookie_expired() {
+            match self.auth() {
+                Ok(_) => Ok(()),
+                Err(err) => Err(err),
+            }?
+        }
+
+        Ok(())
     }
 
     /// Make an authenticated GET to Bitwarden Admin
-    fn get(&mut self, path: &str) -> Response {
-        self.ensure_auth();
+    fn get(&mut self, path: &str) -> Result<Response, ResponseError> {
+        self.ensure_auth()?;
 
-        match &self.cookie {
-            None => {
-                panic!("We haven't authenticated. Must be an error");
-            }
-            Some(cookie) => {
-                let url = format!("{}/admin{}", &self.url, path);
-                let client = self.get_http_client();
-                let request = client
-                    .get(url.as_str())
-                    .header(reqwest::header::COOKIE, cookie.clone());
-                let response = request.send().unwrap_or_else(|e| {
-                    panic!("Could not call with {}. {:?}", url, e);
-                });
+        let url = format!("{}/admin{}", &self.url, path);
+        let client = self.get_http_client();
+        let request = client.get(url.as_str()).header(
+            reqwest::header::COOKIE,
+            self.cookie
+                .as_ref()
+                .expect("No cookie found to add to header")
+                .clone(),
+        );
 
-                // TODO: Handle error statuses
+        let response = request.send()?.error_for_status()?;
 
-                return response;
-            }
-        }
+        Ok(response)
     }
 
     /// Make authenticated POST to Bitwarden Admin with JSON data
-    fn post(&mut self, path: &str, json: &HashMap<String, String>) -> Response {
-        self.ensure_auth();
+    fn post(
+        &mut self,
+        path: &str,
+        json: &HashMap<String, String>,
+    ) -> Result<Response, ResponseError> {
+        self.ensure_auth()?;
 
-        match &self.cookie {
-            None => {
-                panic!("We haven't authenticated. Must be an error");
-            }
-            Some(cookie) => {
-                let url = format!("{}/admin{}", &self.url, path);
-                let client = self.get_http_client();
-                let request = client
-                    .post(url.as_str())
-                    .header("Cookie", cookie.clone())
-                    .json(&json);
-                let response = request.send().unwrap_or_else(|e| {
-                    panic!("Could not call with {}. {:?}", url, e);
-                });
+        let url = format!("{}/admin{}", &self.url, path);
+        let client = self.get_http_client();
+        let request = client.post(url.as_str()).json(&json).header(
+            reqwest::header::COOKIE,
+            self.cookie
+                .as_ref()
+                .expect("No cookie found to add to header")
+                .clone(),
+        );
 
-                // TODO: Handle error statuses
+        let response = request.send()?.error_for_status()?;
 
-                return response;
-            }
-        }
+        Ok(response)
     }
 
     /// Invite user with provided email
-    pub fn invite(&mut self, email: &str) -> Response {
+    pub fn invite(&mut self, email: &str) -> Result<Response, ResponseError> {
         let mut json = HashMap::new();
         json.insert("email".to_string(), email.to_string());
 
@@ -175,8 +178,8 @@ impl Client {
     }
 
     /// Get all existing users
-    pub fn users(&mut self) -> Result<Vec<User>, Box<dyn Error>> {
-        let all_users: Vec<User> = self.get("/users").json()?;
+    pub fn users(&mut self) -> Result<Vec<User>, ResponseError> {
+        let all_users: Vec<User> = self.get("/users")?.json()?;
         Ok(all_users)
     }
 }
