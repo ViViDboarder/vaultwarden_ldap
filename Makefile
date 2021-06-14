@@ -14,6 +14,9 @@ target/debug/vaultwarden_ldap: src/
 target/release/vaultwarden_ldap: src/
 	cargo build --locked --release
 
+.PHONY: build
+build: debug
+
 .PHONY: debug
 debug: target/debug/vaultwarden_ldap
 
