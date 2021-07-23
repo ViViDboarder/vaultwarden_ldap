@@ -33,6 +33,24 @@ run-debug: target/debug/vaultwarden_ldap
 test:
 	cargo test
 
+# Run bootstrapped integration test
+.PHONY: itest
+itest:
+	docker-compose -f docker-compose.yml \
+		-f itest/docker-compose.itest.yml \
+		up --build
+
+# Run bootstrapped integration test using env for config
+.PHONY: itest-env
+itest-env:
+	docker-compose -f docker-compose.yml \
+		-f itest/docker-compose.itest-env.yml \
+		up --build
+
+.PHONY: clean-itest
+clean-itest:
+	docker-compose down -v
+
 # Installs pre-commit hooks
 .PHONY: install-hooks
 install-hooks:
