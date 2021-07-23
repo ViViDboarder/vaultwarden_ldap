@@ -4,13 +4,14 @@ WORKDIR /home/rust/src
 
 # Cache build deps
 RUN USER=rust cargo init
-COPY Cargo.toml Cargo.lock ./
+COPY --chown=rust:rust Cargo.toml Cargo.lock ./
 RUN cargo build --locked --release && \
         rm src/*.rs
 
 COPY --chown=rust:rust ./src ./src
-RUN touch ./src/main.rs && \
-        cargo build --release
+RUN USER=rust touch ./src/main.rs
+# hadolint ignore=DL3059
+RUN cargo build --release
 
 FROM alpine:3
 RUN apk --no-cache add ca-certificates=20191127-r5
