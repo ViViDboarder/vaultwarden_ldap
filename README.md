@@ -34,6 +34,8 @@ Configuration values are as follows:
 |`ldap_sync_interval_seconds`|Integer|Optional|Number of seconds to wait between each LDAP request. Defaults to `60`|
 |`ldap_sync_loop`|Boolean|Optional|Indicates whether or not syncing should be polled in a loop or done once. Defaults to `true`|
 
+Alternatively, instead of using `config.toml`, all values can be provided using enviroment variables prefixed with `APP_`. For example: `APP_VAULTWARDEN_URL=https://vault.example.com`
+
 ## Development
 
 This repo has a predefined set of [pre-commit](https://pre-commit.com) rules. You can install pre-commit via any means you'd like. Once your system has `pre-commit` installed, you can run `make install-hooks` to ensure the hooks will run with every commit. You can also force running all hooks with `make check`.
