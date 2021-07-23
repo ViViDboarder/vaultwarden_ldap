@@ -26,7 +26,7 @@ pub fn read_config() -> Config {
             println!("{}", err);
             match read_config_from_env() {
                 Ok(config) => config,
-                Err(err) => panic!("{}", err)
+                Err(err) => panic!("{}", err),
             }
         }
     }
@@ -36,27 +36,25 @@ pub fn read_config() -> Config {
 pub fn read_config_from_file() -> Result<Config, String> {
     let config_path = get_config_path();
 
-    let contents = fs::read_to_string(&config_path).map_err(|_| {
-        format!("Failed to open config file at {}", config_path)
-    })?;
-    let config: Config = toml::from_str(contents.as_str()).map_err(|_| {
-        format!("Failed to parse config file at {}", config_path)
-    })?;
+    let contents = fs::read_to_string(&config_path)
+        .map_err(|_| format!("Failed to open config file at {}", config_path))?;
+    let config: Config = toml::from_str(contents.as_str())
+        .map_err(|_| format!("Failed to parse config file at {}", config_path))?;
 
-    println!("Reading config from file at {}", config_path);
+    println!("Config read from file at {}", config_path);
     Ok(config)
 }
 
 // Tries to read configuration from environment
 pub fn read_config_from_env() -> Result<Config, String> {
-    let config = envy::from_env().map_err(|err| {
-        format!("error parsing config from env: {}", err)
-    })?;
-    println!("Reading config from environment");
+    let config = envy::prefixed("APP_")
+        .from_env()
+        .map_err(|err| format!("Error parsing config from env: {}", err))?;
+    println!("Config read from environment");
     Ok(config)
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 /// Contains all config values for LDAP syncing
 pub struct Config {
