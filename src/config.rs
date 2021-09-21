@@ -37,9 +37,9 @@ pub fn read_config_from_file() -> Result<Config, String> {
     let config_path = get_config_path();
 
     let contents = fs::read_to_string(&config_path)
-        .map_err(|_| format!("Failed to open config file at {}", config_path))?;
+        .map_err(|err| format!("Failed to open config file at {}: {}", config_path, err))?;
     let config: Config = toml::from_str(contents.as_str())
-        .map_err(|_| format!("Failed to parse config file at {}", config_path))?;
+        .map_err(|err| format!("Failed to parse config file at {}: {}", config_path, err))?;
 
     println!("Config read from file at {}", config_path);
     Ok(config)
