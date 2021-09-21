@@ -94,9 +94,9 @@ fn search_entries(config: &config::Config) -> Result<Vec<SearchEntry>, AnyError>
     let (results, _res) = ldap
         .with_search_options(SearchOptions::new().deref(DerefAliases::Always))
         .search(
-            &config.get_ldap_search_base_dn().as_str(),
+            config.get_ldap_search_base_dn().as_str(),
             Scope::Subtree,
-            &config.get_ldap_search_filter().as_str(),
+            config.get_ldap_search_filter().as_str(),
             fields,
         )
         .context("LDAP search failure")?
