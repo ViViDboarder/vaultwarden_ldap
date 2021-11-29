@@ -12,6 +12,7 @@ COPY Cargo.toml Cargo.lock ./
 RUN cargo build --locked --release
 
 # Remove bins to make sure we rebuild
+# hadolint ignore=DL3059
 RUN rm ./target/release/deps/vaultwarden_ldap*
 # Copy source and install
 COPY src ./src
