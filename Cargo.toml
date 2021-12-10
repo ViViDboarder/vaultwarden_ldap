@@ -5,7 +5,7 @@ authors = ["ViViDboarder <vividboarder@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-ldap3 = "0.6"
+ldap3 = "0.9"
 serde = { version = "1.0", features = ["derive"] }
 toml = "0.5"
 reqwest = "0.9"
