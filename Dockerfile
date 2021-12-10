@@ -1,7 +1,4 @@
-ARG BUILD_TAG=1.56.1
-ARG RUN_TAG=$BUILD_TAG
-
-FROM rust:$BUILD_TAG as builder
+FROM rust:1.56.1 as builder
 
 WORKDIR /usr/src/
 RUN USER=root cargo new --bin vaultwarden_ldap
