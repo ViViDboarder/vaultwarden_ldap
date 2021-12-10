@@ -68,7 +68,7 @@ fn ldap_client(
     let settings = LdapConnSettings::new()
         .set_starttls(starttls)
         .set_no_tls_verify(no_tls_verify);
-    let ldap = LdapConn::with_settings(settings, ldap_url.as_str())
+    let mut ldap = LdapConn::with_settings(settings, ldap_url.as_str())
         .context("Failed to connect to LDAP server")?;
     ldap.simple_bind(bind_dn.as_str(), bind_pw.as_str())
         .context("Could not bind to LDAP server")?;
@@ -78,7 +78,7 @@ fn ldap_client(
 
 /// Retrieves search results from ldap
 fn search_entries(config: &config::Config) -> Result<Vec<SearchEntry>, AnyError> {
-    let ldap = ldap_client(
+    let mut ldap = ldap_client(
         config.get_ldap_url(),
         config.get_ldap_bind_dn(),
         config.get_ldap_bind_password(),
@@ -90,7 +90,7 @@ fn search_entries(config: &config::Config) -> Result<Vec<SearchEntry>, AnyError>
     let mail_field = config.get_ldap_mail_field();
     let fields = vec!["uid", "givenname", "sn", "cn", mail_field.as_str()];
 
-    // TODO: Something something error handling
+    // Something something error handling
     let (results, _res) = ldap
         .with_search_options(SearchOptions::new().deref(DerefAliases::Always))
         .search(
