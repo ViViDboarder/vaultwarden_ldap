@@ -1,11 +1,16 @@
-FROM rust:1.56.1 as builder
+ARG BUILD_TAG=1.57.0
+ARG RUN_TAG=slim-buster
+FROM rust:${BUILD_TAG}-${RUN_TAG} as builder
 
 WORKDIR /usr/src/
 RUN USER=root cargo new --bin vaultwarden_ldap
 WORKDIR /usr/src/vaultwarden_ldap
 
+# Copy manifests
+COPY ./Cargo.lock ./Cargo.lock
+COPY ./Cargo.toml ./Cargo.toml
+
 # Compile dependencies
-COPY Cargo.toml Cargo.lock ./
 RUN cargo build --locked --release
 
 # Remove bins to make sure we rebuild
@@ -15,7 +20,7 @@ RUN rm ./target/release/deps/vaultwarden_ldap*
 COPY src ./src
 RUN cargo build --release
 
-FROM rust:$RUN_TAG
+FROM rust:${BUILD_TAG}-${RUN_TAG}
 WORKDIR /app
 COPY --from=builder /usr/src/vaultwarden_ldap/target/release/vaultwarden_ldap /usr/local/bin/
 
