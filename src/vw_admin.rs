@@ -2,7 +2,7 @@ extern crate reqwest;
 extern crate serde;
 extern crate thiserror;
 
-use reqwest::Response;
+use reqwest::blocking::Response;
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::fs::File;
@@ -72,8 +72,9 @@ impl Client {
         reqwest::Certificate::from_der(&buf).expect("Could not load DER root cert file")
     }
 
-    fn get_http_client(&self) -> reqwest::Client {
-        let mut client = reqwest::Client::builder().redirect(reqwest::RedirectPolicy::none());
+    fn get_http_client(&self) -> reqwest::blocking::Client {
+        let mut client =
+            reqwest::blocking::Client::builder().redirect(reqwest::redirect::Policy::none());
 
         if !&self.root_cert_file.is_empty() {
             let cert = self.get_root_cert();
