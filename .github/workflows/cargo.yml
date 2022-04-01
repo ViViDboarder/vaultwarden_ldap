@@ -32,4 +32,4 @@ jobs:
           SKIP: hadolint
 
       - name: Run hadolint
-        uses: hadolint/hadolint-action@v1.6.0
+        uses: hadolint/hadolint-action@v2.1.0
