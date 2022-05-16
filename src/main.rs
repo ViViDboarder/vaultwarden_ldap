@@ -1,5 +1,7 @@
 extern crate anyhow;
 extern crate ldap3;
+extern crate pledge;
+extern crate unveil;
 
 use std::collections::HashSet;
 use std::thread::sleep;
@@ -9,6 +11,8 @@ use anyhow::Context as _;
 use anyhow::Error as AnyError;
 use anyhow::Result;
 use ldap3::{DerefAliases, LdapConn, LdapConnSettings, Scope, SearchEntry, SearchOptions};
+use pledge::pledge;
+use unveil::unveil;
 
 mod config;
 mod vw_admin;
@@ -20,6 +24,16 @@ fn main() {
         config.get_vaultwarden_admin_token(),
         config.get_vaultwarden_root_cert_file(),
     );
+
+    unveil(config::get_config_path(), "r")
+        .or_else(unveil::Error::ignore_platform)
+        .expect("Could not unveil config file");
+    unveil("", "")
+        .or_else(unveil::Error::ignore_platform)
+        .expect("Could not disable further unveils");
+    pledge("dns flock inet rpath stdio tty", "")
+        .or_else(pledge::Error::ignore_platform)
+        .expect("Could not pledge permissions");
 
     invite_users(&config, &mut client, config.get_ldap_sync_loop())
 }
