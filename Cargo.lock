@@ -595,6 +595,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d1a3ea4f0dd7f1f3e512cf97bf100819aa547f36a6eccac8dbaae839eb92363e"
 
 [[package]]
+name = "pledge"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "252599417b7d9a43b7fdc63dd790b0848666a8910b2ebe1a25118309c3c981e5"
+dependencies = [
+ "libc",
+]
+
+[[package]]
 name = "ppv-lite86"
 version = "0.2.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -996,6 +1005,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8ccb82d61f80a663efe1f787a51b16b5a51e3314d6ac365b08639f52387b33f3"
 
 [[package]]
+name = "unveil"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5e7fa867d559102001ec694165ed17d5f82e95213060a65f9c8b6280084bbfec"
+dependencies = [
+ "libc",
+]
+
+[[package]]
 name = "url"
 version = "2.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1014,11 +1032,13 @@ dependencies = [
  "anyhow",
  "envy",
  "ldap3",
+ "pledge",
  "reqwest",
  "serde",
  "serde_json",
  "thiserror",
  "toml",
+ "unveil",
 ]
 
 [[package]]
