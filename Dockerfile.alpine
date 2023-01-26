@@ -1,4 +1,4 @@
-FROM ekidd/rust-musl-builder:1.51.0 AS builder
+FROM ekidd/rust-musl-builder:1.57.0 AS builder
 
 WORKDIR /home/rust/src
 
