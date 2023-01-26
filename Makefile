@@ -38,14 +38,28 @@ test:
 itest:
 	docker-compose -f docker-compose.yml \
 		-f itest/docker-compose.itest.yml \
-		up --build
+		build
+	docker-compose -f docker-compose.yml \
+		-f itest/docker-compose.itest.yml \
+		up -d vaultwarden ldap
+	docker-compose -f docker-compose.yml \
+		-f itest/docker-compose.itest.yml \
+		run ldap_sync
+	docker-compose stop
 
 # Run bootstrapped integration test using env for config
 .PHONY: itest-env
 itest-env:
 	docker-compose -f docker-compose.yml \
 		-f itest/docker-compose.itest-env.yml \
-		up --build
+		build
+	docker-compose -f docker-compose.yml \
+		-f itest/docker-compose.itest-env.yml \
+		up -d vaultwarden ldap
+	docker-compose -f docker-compose.yml \
+		-f itest/docker-compose.itest-env.yml \
+		run ldap_sync
+	docker-compose stop
 
 .PHONY: clean-itest
 clean-itest:

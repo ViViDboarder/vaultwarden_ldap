@@ -44,7 +44,18 @@ For those less familiar with `cargo`, you can use the `make` targets that have b
 
 ## Testing
 
-All testing is manual right now. First step is to set up Bitwarden and the LDAP server.
+There are no unit tests, but there are integration tests that require manual verification.
+
+### Integration tests
+
+Running `make itest` will spin up an ldap server with a test user, a Vaultwarden server, and then run the sync. If successful the log should show an invitation sent to the test user. If you run `make itest` again, it should show no invites sent because the user already has been invited. If you'd like to reset the testing, `make clean-itest` will clear out the Vaultwarden database and start fresh.
+
+It's also possible to test passing configs via enviornment variables by running `make itest-env`. The validation steps are the same.
+
+
+### Steps for manual testing
+
+The first step is to set up Bitwarden and the LDAP server.
 
 ```bash
 docker-compose up -d vaultwarden ldap ldap_admin
@@ -74,8 +85,3 @@ docker-compose up ldap_sync
 Alternately, you can bootstrap some of this by running:
 
     docker-compose -f docker-compose.yml -f itest/docker-compose.itest.yml up --build
-
-## Future
-
-* Any kind of proper logging
-* Tests

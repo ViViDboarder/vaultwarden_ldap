@@ -24,6 +24,7 @@ services:
       ADMIN_TOKEN: admin
       SIGNUPS_ALLOWED: 'false'
       INVITATIONS_ALLOWED: 'true'
+      I_REALLY_WANT_VOLATILE_STORAGE: 'true'
 
   ldap:
     image: osixia/openldap

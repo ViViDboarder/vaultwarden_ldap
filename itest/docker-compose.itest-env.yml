@@ -11,7 +11,7 @@ services:
       APP_LDAP_BIND_PASSWORD: "admin"
       APP_LDAP_SEARCH_BASE_DN: "dc=example,dc=org"
       APP_LDAP_SEARCH_FILTER: "(&(objectClass=*)(uid=*))"
-      APP_LDAP_SYNC_INTERVAL_SECONDS: 10
+      APP_LDAP_SYNC_LOOP: "false"
 
   vaultwarden:
 
