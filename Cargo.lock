@@ -386,9 +386,9 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "lber"
-version = "0.4.0"
+version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b5d85f5e00e12cb50c70c3b1c1f0daff6546eb4c608b44d0a990e38a539e0446"
+checksum = "2df7f9fd9f64cf8f59e1a4a0753fe7d575a5b38d3d7ac5758dcee9357d83ef0a"
 dependencies = [
  "bytes",
  "nom",
@@ -396,9 +396,9 @@ dependencies = [
 
 [[package]]
 name = "ldap3"
-version = "0.11.1"
+version = "0.11.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c5cfbd3c59ca16d6671b002b8b3dd013cd825d9c77a1664a3135194d3270511e"
+checksum = "6dceb52eac140c8679326f619b963577ccf5a4ab025fe5e6db424d2fd3e4f400"
 dependencies = [
  "async-trait",
  "bytes",
