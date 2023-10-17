@@ -5,8 +5,6 @@ services:
     volumes:
       - ./itest/config.toml:/config.toml:ro
 
-  vaultwarden:
-
   ldap:
     command: ["--copy-service"]
     volumes:
