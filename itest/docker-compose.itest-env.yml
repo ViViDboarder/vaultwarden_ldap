@@ -13,7 +13,7 @@ services:
       APP_LDAP_SEARCH_FILTER: "(&(objectClass=*)(uid=*))"
       APP_LDAP_SYNC_LOOP: "false"
 
-  vaultwarden:
+  vaultwarden: {}
 
   ldap:
     command: ["--copy-service"]
