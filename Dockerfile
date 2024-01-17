@@ -18,8 +18,10 @@ RUN rm ./target/release/deps/vaultwarden_ldap*
 COPY src ./src
 RUN cargo build --release
 
-FROM rust:$RUN_TAG
+FROM ubuntu:focal
 WORKDIR /app
+RUN apt update -y
+RUN apt install -y libssl-dev --no-install-recommends
 COPY --from=builder /usr/src/vaultwarden_ldap/target/release/vaultwarden_ldap /usr/local/bin/
 
 CMD ["/usr/local/bin/vaultwarden_ldap"]
