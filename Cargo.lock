@@ -1264,7 +1264,7 @@ dependencies = [
 
 [[package]]
 name = "vaultwarden_ldap"
-version = "1.0.2"
+version = "2.0.0"
 dependencies = [
  "anyhow",
  "envy",
