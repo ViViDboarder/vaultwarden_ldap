@@ -85,12 +85,8 @@ clean:
 	rm -f ./target
 
 .PHONY: docker-build-all
-docker-build-all: docker-build docker-build-alpine
+docker-build-all: docker-build
 
 .PHONY: docker-build
 docker-build:
 	docker build -f ./Dockerfile -t $(DOCKER_TAG) .
-
-.PHONY: docker-build-alpine
-docker-build-alpine:
-	docker build -f ./Dockerfile.alpine -t $(DOCKER_TAG):alpine .
