@@ -19,9 +19,6 @@ jobs:
           - dockerfile: Dockerfile
             latest: "auto"
             suffix: ""
-          - dockerfile: Dockerfile.alpine
-            latest: "false"
-            suffix: "-alpine"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
