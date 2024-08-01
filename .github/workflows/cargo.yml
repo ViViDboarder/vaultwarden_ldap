@@ -24,7 +24,7 @@ jobs:
       - name: Run tests
         run: cargo test --verbose
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
 
       - name: Run pre-commit hooks
         uses: pre-commit/action@v3.0.0
