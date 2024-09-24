@@ -10,7 +10,7 @@ services:
       # ./root.cert:/usr/src/vaultwarden_ldap/root.cert:ro
     environment:
       CONFIG_PATH: /config.toml
-      RUST_BACKTRACE: 1
+      RUST_BACKTRACE: full
     depends_on:
       - vaultwarden
       - ldap
