@@ -36,22 +36,22 @@ test:
 # Run bootstrapped integration test
 .PHONY: itest-up
 itest-up:
-	docker-compose -f docker-compose.yml \
+	docker compose -f docker-compose.yml \
 		-f itest/docker-compose.itest.yml \
 		build
-	docker-compose -f docker-compose.yml \
+	docker compose -f docker-compose.yml \
 		-f itest/docker-compose.itest.yml \
 		up -d vaultwarden ldap
 
 .PHONY: itest-run
 itest-run:
-	docker-compose -f docker-compose.yml \
+	docker compose -f docker-compose.yml \
 		-f itest/docker-compose.itest.yml \
 		run ldap_sync
 
 .PHONY: itest-stop
 itest-stop:
-	docker-compose stop
+	docker compose stop
 
 .PHONY: itest
 itest: itest-up itest-run itest-stop
@@ -59,20 +59,20 @@ itest: itest-up itest-run itest-stop
 # Run bootstrapped integration test using env for config
 .PHONY: itest-env
 itest-env:
-	docker-compose -f docker-compose.yml \
+	docker compose -f docker-compose.yml \
 		-f itest/docker-compose.itest-env.yml \
 		build
-	docker-compose -f docker-compose.yml \
+	docker compose -f docker-compose.yml \
 		-f itest/docker-compose.itest-env.yml \
 		up -d vaultwarden ldap
-	docker-compose -f docker-compose.yml \
+	docker compose -f docker-compose.yml \
 		-f itest/docker-compose.itest-env.yml \
 		run ldap_sync
-	docker-compose stop
+	docker compose stop
 
 .PHONY: clean-itest
 clean-itest:
-	docker-compose down -v
+	docker compose down -v
 
 # Installs pre-commit hooks
 .PHONY: install-hooks

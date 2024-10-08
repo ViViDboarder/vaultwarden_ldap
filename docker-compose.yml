@@ -1,5 +1,4 @@
 ---
-version: '3'
 services:
   ldap_sync:
     build:
