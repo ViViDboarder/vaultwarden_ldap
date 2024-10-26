@@ -70,8 +70,8 @@ pub struct Config {
     ldap_port: Option<u16>,
     ldap_no_tls_verify: Option<bool>,
     // LDAP auth config
-    ldap_bind_dn: String,
-    ldap_bind_password: Pass,
+    ldap_bind_dn: Option<String>,
+    ldap_bind_password: Option<Pass>,
     // LDAP search config
     ldap_search_base_dn: String,
     ldap_search_filter: String,
@@ -155,11 +155,11 @@ impl Config {
         }
     }
 
-    pub fn get_ldap_bind_dn(&self) -> String {
+    pub fn get_ldap_bind_dn(&self) -> Option<String> {
         self.ldap_bind_dn.clone()
     }
 
-    pub fn get_ldap_bind_password(&self) -> String {
+    pub fn get_ldap_bind_password(&self) -> Option<String> {
         self.ldap_bind_password.clone()
     }
 
