@@ -74,8 +74,8 @@ fn get_existing_users(client: &mut vw_admin::Client) -> Result<HashSet<String>, 
 /// Creates an LDAP connection, authenticating if necessary
 fn ldap_client(
     ldap_url: String,
-    bind_dn: String,
-    bind_pw: String,
+    bind_dn: Option<String>,
+    bind_pw: Option<String>,
     no_tls_verify: bool,
     starttls: bool,
 ) -> Result<LdapConn, AnyError> {
@@ -84,8 +84,11 @@ fn ldap_client(
         .set_no_tls_verify(no_tls_verify);
     let mut ldap = LdapConn::with_settings(settings, ldap_url.as_str())
         .context("Failed to connect to LDAP server")?;
-    ldap.simple_bind(bind_dn.as_str(), bind_pw.as_str())
-        .context("Could not bind to LDAP server")?;
+
+    if bind_dn.is_some() && bind_pw.is_some() {
+        ldap.simple_bind(&bind_dn.unwrap(), &bind_pw.unwrap())
+            .context("Could not bind to LDAP server")?;
+    }
 
     Ok(ldap)
 }
