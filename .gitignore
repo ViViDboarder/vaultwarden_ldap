@@ -6,4 +6,4 @@
 **/*.rs.bk
 
 # Ignore config while developing
-config.toml
+./config.toml
