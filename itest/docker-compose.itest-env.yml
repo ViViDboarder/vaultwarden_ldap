@@ -17,4 +17,4 @@ services:
   ldap:
     command: ["--copy-service"]
     volumes:
-      - ./itest/50-seed-user.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/50-seed-user.ldif
+      - ./itest/ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom
