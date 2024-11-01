@@ -1,4 +1,4 @@
-FROM rust:1.81 as builder
+FROM rust:1.82 as builder
 
 WORKDIR /usr/src/
 RUN USER=root cargo new --bin vaultwarden_ldap
