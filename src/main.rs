@@ -85,10 +85,18 @@ fn ldap_client(
     let mut ldap = LdapConn::with_settings(settings, ldap_url.as_str())
         .context("Failed to connect to LDAP server")?;
 
-    if bind_dn.is_some() && bind_pw.is_some() {
-        ldap.simple_bind(&bind_dn.unwrap(), &bind_pw.unwrap())
-            .context("Could not bind to LDAP server")?;
-    }
+    match (bind_dn, bind_pw) {
+        (None, None) => println!("Anonymously binding"),
+        (Some(bind_dn), Some(bind_pw)) => {
+            println!("Attempting to bind");
+            ldap.simple_bind(&bind_dn, &bind_pw)
+                .context("Could nott bind to LDAP server")?;
+        }
+
+        // Invalid authentication paths
+        (None, Some(_)) => Err(anyhow::anyhow!("Unable to bind without username"))?,
+        (Some(_), None) => Err(anyhow::anyhow!("Unable to bind without username"))?,
+    };
 
     Ok(ldap)
 }

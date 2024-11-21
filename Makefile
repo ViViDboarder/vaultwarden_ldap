@@ -56,6 +56,29 @@ itest-stop:
 .PHONY: itest
 itest: itest-up itest-run itest-stop
 
+# Run bootstrapped integration test for anonymous bind
+.PHONY: itest-up-anon
+itest-up-anon:
+	docker compose -f docker-compose.yml \
+		-f itest/docker-compose.itest.yml \
+		build
+	docker compose -f docker-compose.yml \
+		-f itest/docker-compose.itest.yml \
+		up -d vaultwarden ldap
+
+.PHONY: itest-run-anon
+itest-run-anon:
+	docker compose -f docker-compose.yml \
+		-f itest/docker-compose.itest.yml \
+		run ldap_sync
+
+.PHONY: itest-stop-anon
+itest-stop-anon:
+	docker compose stop
+
+.PHONY: itest-anon
+itest: itest-up-anon itest-run-anon itest-stop-anon
+
 # Run bootstrapped integration test using env for config
 .PHONY: itest-env
 itest-env:
