@@ -1,0 +1,12 @@
+---
+services:
+  ldap_sync:
+    volumes:
+      - ./itest/config-anon.toml:/config.toml:ro
+
+  vaultwarden: {}
+
+  ldap:
+    command: ["--copy-service"]
+    volumes:
+      - ./itest/50-seed-user.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/50-seed-user.ldif
