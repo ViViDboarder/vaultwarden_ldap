@@ -74,8 +74,8 @@ fn get_existing_users(client: &mut vw_admin::Client) -> Result<HashSet<String>, 
 /// Creates an LDAP connection, authenticating if necessary
 fn ldap_client(
     ldap_url: String,
-    bind_dn: String,
-    bind_pw: String,
+    bind_dn: Option<String>,
+    bind_pw: Option<String>,
     no_tls_verify: bool,
     starttls: bool,
 ) -> Result<LdapConn, AnyError> {
@@ -84,8 +84,19 @@ fn ldap_client(
         .set_no_tls_verify(no_tls_verify);
     let mut ldap = LdapConn::with_settings(settings, ldap_url.as_str())
         .context("Failed to connect to LDAP server")?;
-    ldap.simple_bind(bind_dn.as_str(), bind_pw.as_str())
-        .context("Could not bind to LDAP server")?;
+
+    match (bind_dn, bind_pw) {
+        (None, None) => println!("Anonymously binding"),
+        (Some(bind_dn), Some(bind_pw)) => {
+            println!("Attempting to bind");
+            ldap.simple_bind(&bind_dn, &bind_pw)
+                .context("Could nott bind to LDAP server")?;
+        }
+
+        // Invalid authentication paths
+        (None, Some(_)) => Err(anyhow::anyhow!("Unable to bind without username"))?,
+        (Some(_), None) => Err(anyhow::anyhow!("Unable to bind without username"))?,
+    };
 
     Ok(ldap)
 }
