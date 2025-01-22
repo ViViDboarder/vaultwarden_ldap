@@ -72,7 +72,7 @@ itest-env:
 
 .PHONY: clean-itest
 clean-itest:
-	docker compose down -v
+	docker compose down -v --remove-orphans
 
 # Installs pre-commit hooks
 .PHONY: install-hooks

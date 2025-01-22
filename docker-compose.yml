@@ -26,14 +26,17 @@ services:
       I_REALLY_WANT_VOLATILE_STORAGE: 'true'
 
   ldap:
-    image: osixia/openldap
-    volumes:
-      - /var/lib/ldap
-      - /etc/ldap/slapd.d
+    image: bitnami/openldap:latest
     environment:
-      LDAP_READONLY_USER: 'true'
-      LDAP_READONLY_USER_USERNAME: readonly
-      LDAP_READONLY_USER_PASSWORD: readonly
+      LDAP_PORT_NUMBER: 389
+      LDAP_ROOT: dc=example,dc=org
+      LDAP_ADMIN_USERNAME: admin
+      LDAP_ADMIN_PASSWORD: adminpassword
+
+      LDAP_SKIP_DEFAULT_TREE: yes
+      LDAP_CUSTOM_LDIF_DIR: /ldifs
+    volumes:
+      - ./itest/ldif:/ldifs
 
   ldap_admin:
     image: osixia/phpldapadmin

@@ -14,7 +14,4 @@ services:
 
   vaultwarden: {}
 
-  ldap:
-    command: ["--copy-service"]
-    volumes:
-      - ./itest/ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom
+  ldap: {}
