@@ -64,7 +64,7 @@ itest-up-anon:
 		build
 	docker compose -f docker-compose.yml \
 		-f itest/docker-compose.itest-anon.yml \
-		up -d vaultwarden ldap
+		up -d vaultwarden ldap ldap_admin
 
 .PHONY: itest-run-anon
 itest-run-anon:
