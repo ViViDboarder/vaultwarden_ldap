@@ -1,8 +1,0 @@
-vaultwarden_url = "http://vaultwarden:80"
-vaultwarden_admin_token = "admin"
-ldap_host = "ldap"
-# ldap_bind_dn = "cn=readonly,dc=example,dc=org"
-# ldap_bind_password = "readonly"
-ldap_search_base_dn = "dc=example,dc=org"
-ldap_search_filter = "(&(objectClass=*)(uid=*))"
-ldap_sync_loop = false
