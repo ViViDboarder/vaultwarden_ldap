@@ -114,7 +114,7 @@ check-version:
 
 .PHONY: clean
 clean:
-	rm -f ./target
+	rm -fr ./target
 
 .PHONY: docker-build-all
 docker-build-all: docker-build
