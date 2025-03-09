@@ -148,7 +148,6 @@ fn invite_from_ldap(
     let mut num_users = 0;
 
     for ldap_user in search_entries(config)? {
-        //
         // Safely get first email from list of emails in field
         if let Some(user_email) = ldap_user
             .attrs
@@ -159,9 +158,20 @@ fn invite_from_ldap(
                 println!("User with email already exists: {}", user_email);
             } else {
                 println!("Try to invite user: {}", user_email);
-                client
-                    .invite(user_email)
-                    .context(format!("Failed to invite user {}", user_email))?;
+                if let Err(request_error) = client.invite(user_email) {
+                    match request_error {
+                        vw_admin::ResponseError::HttpError(api_error) if api_error.is_body() => {
+                            println!(
+                                "Failed to invite user {} with request body error {}",
+                                user_email, api_error
+                            )
+                        }
+                        _ => panic!(
+                            "Failed to invite user {} with error {}",
+                            user_email, request_error
+                        ),
+                    }
+                }
                 num_users += 1;
             }
         } else {
