@@ -23,7 +23,7 @@ pub fn read_config() -> Config {
     match read_config_from_file() {
         Ok(config) => config,
         Err(err) => {
-            println!("{}", err);
+            println!("Error: {}", err);
             match read_config_from_env() {
                 Ok(config) => config,
                 Err(err) => panic!("{}", err),
@@ -36,10 +36,18 @@ pub fn read_config() -> Config {
 pub fn read_config_from_file() -> Result<Config, String> {
     let config_path = get_config_path();
 
-    let contents = fs::read_to_string(&config_path)
-        .map_err(|err| format!("Failed to open config file at {}: {}", config_path, err))?;
-    let config: Config = toml::from_str(contents.as_str())
-        .map_err(|err| format!("Failed to parse config file at {}: {}", config_path, err))?;
+    let contents = fs::read_to_string(&config_path).map_err(|err| {
+        format!(
+            "Error: Failed to open config file at {}: {}",
+            config_path, err
+        )
+    })?;
+    let config: Config = toml::from_str(contents.as_str()).map_err(|err| {
+        format!(
+            "Error: Failed to parse config file at {}: {}",
+            config_path, err
+        )
+    })?;
 
     println!("Config read from file at {}", config_path);
     Ok(config)
@@ -49,7 +57,8 @@ pub fn read_config_from_file() -> Result<Config, String> {
 pub fn read_config_from_env() -> Result<Config, String> {
     let config = envy::prefixed("APP_")
         .from_env()
-        .map_err(|err| format!("Error parsing config from env: {}", err))?;
+        .map_err(|err| format!("Error: Could not parse config from env: {}", err))?;
+
     println!("Config read from environment");
     Ok(config)
 }
@@ -60,7 +69,8 @@ pub fn read_config_from_env() -> Result<Config, String> {
 pub struct Config {
     // Bitwarden connection config
     vaultwarden_url: String,
-    vaultwarden_admin_token: String,
+    vaultwarden_admin_token: Option<String>,
+    vaultwarden_admin_token_file: Option<String>,
     vaultwarden_root_cert_file: Option<String>,
     // LDAP Connection config
     ldap_host: String,
@@ -72,6 +82,7 @@ pub struct Config {
     // LDAP auth config
     ldap_bind_dn: Option<String>,
     ldap_bind_password: Option<Pass>,
+    ldap_bind_password_file: Option<Pass>,
     // LDAP search config
     ldap_search_base_dn: String,
     ldap_search_filter: String,
@@ -94,7 +105,21 @@ impl Config {
     }
 
     pub fn get_vaultwarden_admin_token(&self) -> String {
-        self.vaultwarden_admin_token.clone()
+        match &self.vaultwarden_admin_token {
+            // If we have a token value, return it
+            Some(vaultwarden_admin_token) => vaultwarden_admin_token.clone(),
+            // If not, try to read it from a file
+            None => match &self.vaultwarden_admin_token_file {
+                Some(vaultwarden_admin_token_file) => {
+                    fs::read_to_string(vaultwarden_admin_token_file)
+                        .expect("Failed to read vaultwarden admin token file")
+                        .trim()
+                        .to_string()
+                }
+                // If we don't have a token value or a file, raise an error
+                None => panic!("No vaultwarden admin token provided"),
+            },
+        }
     }
 
     pub fn get_vaultwarden_root_cert_file(&self) -> String {
@@ -160,7 +185,18 @@ impl Config {
     }
 
     pub fn get_ldap_bind_password(&self) -> Option<String> {
-        self.ldap_bind_password.clone()
+        match &self.ldap_bind_password {
+            Some(ldap_bind_password) => Some(ldap_bind_password.clone()),
+            None => self
+                .ldap_bind_password_file
+                .as_ref()
+                .map(|ldap_bind_password_file| {
+                    fs::read_to_string(ldap_bind_password_file)
+                        .expect("Failed to read ldap bind password file")
+                        .trim()
+                        .to_string()
+                }),
+        }
     }
 
     pub fn get_ldap_search_base_dn(&self) -> String {
