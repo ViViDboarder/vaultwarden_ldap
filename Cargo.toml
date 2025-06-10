@@ -2,7 +2,7 @@
 name = "vaultwarden_ldap"
 version = "2.1.2"
 authors = ["ViViDboarder <vividboarder@gmail.com>"]
-edition = "2025"
+edition = "2018"
 
 [dependencies]
 ldap3 = "0.11"
