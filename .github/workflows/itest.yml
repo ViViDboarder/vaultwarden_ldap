@@ -1,5 +1,5 @@
 ---
-name: Test
+name: Integration Test
 
 "on":
   push: {}
@@ -11,9 +11,10 @@ jobs:
   test:
     strategy:
       matrix:
-        - itest-run
-        - itest-run-anon
-        - itest-run-env
+        - target:
+          - itest-run
+          - itest-run-anon
+          - itest-run-env
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -33,9 +34,9 @@ jobs:
       - name: Execute itests
         run: |
           sleep 5
-          make itest-run | tee test-output.log
+          make ${{ matrix.target }} | tee ${{ matrix.target }}.log
       - name: Check logs
         run: |
-          grep -q "Try to invite user: test@example.com" test-output.log
-          grep -q "Try to invite user: test+plus@example.com" test-output.log
+          grep -q "Try to invite user: test@example.com" ${{ matrix.target }}.log
+          grep -q "Try to invite user: test+plus@example.com" ${{ matrix.target }}.log
           docker compose logs vaultwarden | grep -q "POST /admin/invite application/json => 200 OK"
