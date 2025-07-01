@@ -6,17 +6,11 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule: {interval: monthly}
-    reviewers: [ViViDboarder]
-    assignees: [ViViDboarder]
 
   - package-ecosystem: docker
     directory: /
     schedule: {interval: monthly}
-    reviewers: [ViViDboarder]
-    assignees: [ViViDboarder]
 
   - package-ecosystem: cargo
     directory: /
     schedule: {interval: monthly}
-    reviewers: [ViViDboarder]
-    assignees: [ViViDboarder]
