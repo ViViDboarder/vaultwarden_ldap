@@ -1,0 +1,41 @@
+---
+name: Test
+
+"on":
+  push: {}
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        - itest-run
+        - itest-run-anon
+        - itest-run-env
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Start service dependencies
+        uses: hoverkraft-tech/compose-action@v2.2.0
+        with:
+          up-flags: --build
+          down-flags: --volumes
+          compose-file: |
+            ./docker-compose.yml
+            ./itest/docker-compose.itest.yml
+          services: |
+            vaultwarden
+            ldap
+      - name: Execute itests
+        run: |
+          sleep 5
+          make itest-run | tee test-output.log
+      - name: Check logs
+        run: |
+          grep -q "Try to invite user: test@example.com" test-output.log
+          grep -q "Try to invite user: test+plus@example.com" test-output.log
+          docker compose logs vaultwarden | grep -q "POST /admin/invite application/json => 200 OK"
