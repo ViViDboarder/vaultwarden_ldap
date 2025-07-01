@@ -11,10 +11,10 @@ jobs:
   test:
     strategy:
       matrix:
-        - target:
-          - itest-run
-          - itest-run-anon
-          - itest-run-env
+        target:
+        - itest-run
+        - itest-run-anon
+        - itest-run-env
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
