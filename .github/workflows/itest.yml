@@ -1,0 +1,52 @@
+---
+name: Integration Test
+
+"on":
+  push: {}
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Start service dependencies
+        uses: hoverkraft-tech/compose-action@v2.2.0
+        with:
+          up-flags: --build
+          down-flags: --volumes
+          compose-file: |
+            ./docker-compose.yml
+            ./itest/docker-compose.itest.yml
+          services: |
+            vaultwarden
+            ldap
+      - name: Run itest
+        run: |
+          sleep 5
+          make itest-run | tee itest.log
+          grep -q "Try to invite user: test@example.com" itest.log
+          grep -q "Try to invite user: test+plus@example.com" itest.log
+          docker compose logs vaultwarden | grep -q "POST /admin/invite application/json => 200 OK"
+          make clean-itest
+      - name: Run itest-anon
+        run: |
+          make itest-up-anon
+          sleep 5
+          make itest-run-anon | tee itest.log
+          grep -q "Try to invite user: test@example.com" itest.log
+          grep -q "Try to invite user: test+plus@example.com" itest.log
+          docker compose logs vaultwarden | grep -q "POST /admin/invite application/json => 200 OK"
+          make clean-itest
+      - name: Run itest-env
+        run: |
+          make itest-up-env
+          sleep 5
+          make itest-run-env | tee itest.log
+          grep -q "Try to invite user: test@example.com" itest.log
+          grep -q "Try to invite user: test+plus@example.com" itest.log
+          docker compose logs vaultwarden | grep -q "POST /admin/invite application/json => 200 OK"
+          make clean-itest

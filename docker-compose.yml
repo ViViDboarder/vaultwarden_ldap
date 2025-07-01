@@ -18,7 +18,7 @@ services:
   vaultwarden:
     image: vaultwarden/server
     ports:
-      - 8000:80
+      - 80
     environment:
       ADMIN_TOKEN: admin
       SIGNUPS_ALLOWED: 'false'
@@ -41,7 +41,7 @@ services:
   ldap_admin:
     image: osixia/phpldapadmin
     ports:
-      - 8001:80
+      - 80
     environment:
       PHPLDAPADMIN_HTTPS: 'false'
       PHPLDAPADMIN_LDAP_HOSTS: ldap
