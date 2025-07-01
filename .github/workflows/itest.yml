@@ -9,17 +9,10 @@ name: Integration Test
 
 jobs:
   test:
-    strategy:
-      matrix:
-        target:
-        - itest-run
-        - itest-run-anon
-        - itest-run-env
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Start service dependencies
         uses: hoverkraft-tech/compose-action@v2.2.0
         with:
@@ -31,12 +24,29 @@ jobs:
           services: |
             vaultwarden
             ldap
-      - name: Execute itests
+      - name: Run itest
         run: |
           sleep 5
-          make ${{ matrix.target }} | tee ${{ matrix.target }}.log
-      - name: Check logs
-        run: |
-          grep -q "Try to invite user: test@example.com" ${{ matrix.target }}.log
-          grep -q "Try to invite user: test+plus@example.com" ${{ matrix.target }}.log
+          make itest-run | tee itest.log
+          grep -q "Try to invite user: test@example.com" itest.log
+          grep -q "Try to invite user: test+plus@example.com" itest.log
           docker compose logs vaultwarden | grep -q "POST /admin/invite application/json => 200 OK"
+          make clean-itest
+      - name: Run itest-anon
+        run: |
+          make itest-up-anon
+          sleep 5
+          make itest-run-anon | tee itest.log
+          grep -q "Try to invite user: test@example.com" itest.log
+          grep -q "Try to invite user: test+plus@example.com" itest.log
+          docker compose logs vaultwarden | grep -q "POST /admin/invite application/json => 200 OK"
+          make clean-itest
+      - name: Run itest-env
+        run: |
+          make itest-up-env
+          sleep 5
+          make itest-run-env | tee itest.log
+          grep -q "Try to invite user: test@example.com" itest.log
+          grep -q "Try to invite user: test+plus@example.com" itest.log
+          docker compose logs vaultwarden | grep -q "POST /admin/invite application/json => 200 OK"
+          make clean-itest
