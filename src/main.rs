@@ -156,27 +156,26 @@ fn invite_from_ldap(
             .and_then(|l| (l.first()))
         {
             if existing_users.contains(&user_email.to_lowercase()) {
-                println!("User with email already exists: {}", user_email);
+                println!("User with email already exists: {user_email}");
             } else {
-                println!("Try to invite user: {}", user_email);
+                println!("Try to invite user: {user_email}");
                 client
                     .invite(user_email)
-                    .context(format!("Failed to invite user {}", user_email))?;
+                    .context(format!("Failed to invite user {user_email}"))?;
                 num_users += 1;
             }
         } else {
             match ldap_user.attrs.get("uid").and_then(|l| l.first()) {
-                Some(user_uid) => println!(
-                    "Warning: Email field, {:?}, not found on user {}",
-                    mail_field, user_uid
-                ),
-                None => println!("Warning: Email field, {:?}, not found on user", mail_field),
+                Some(user_uid) => {
+                    println!("Warning: Email field, {mail_field:?}, not found on user {user_uid}")
+                }
+                None => println!("Warning: Email field, {mail_field:?}, not found on user"),
             }
         }
     }
 
     // Maybe think about returning this value for some other use
-    println!("Sent invites to {} user(s).", num_users);
+    println!("Sent invites to {num_users} user(s).");
 
     Ok(())
 }
@@ -188,10 +187,7 @@ fn start_sync_loop(config: &config::Config, client: &mut vw_admin::Client) -> Re
     let fail_limit = 5;
     loop {
         if let Err(err) = invite_from_ldap(config, client) {
-            println!(
-                "Error inviting users from ldap. Count {}: {:?}",
-                fail_count, err
-            );
+            println!("Error inviting users from ldap. Count {fail_count}: {err:?}");
             fail_count += 1;
             if fail_count > fail_limit {
                 return Err(err);

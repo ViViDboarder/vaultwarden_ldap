@@ -23,7 +23,7 @@ pub fn read_config() -> Config {
     match read_config_from_file() {
         Ok(config) => config,
         Err(err) => {
-            println!("Error: {}", err);
+            println!("Error: {err}");
             match read_config_from_env() {
                 Ok(config) => config,
                 Err(err) => panic!("{}", err),
@@ -36,20 +36,12 @@ pub fn read_config() -> Config {
 pub fn read_config_from_file() -> Result<Config, String> {
     let config_path = get_config_path();
 
-    let contents = fs::read_to_string(&config_path).map_err(|err| {
-        format!(
-            "Error: Failed to open config file at {}: {}",
-            config_path, err
-        )
-    })?;
-    let config: Config = toml::from_str(contents.as_str()).map_err(|err| {
-        format!(
-            "Error: Failed to parse config file at {}: {}",
-            config_path, err
-        )
-    })?;
+    let contents = fs::read_to_string(&config_path)
+        .map_err(|err| format!("Error: Failed to open config file at {config_path}: {err}"))?;
+    let config: Config = toml::from_str(contents.as_str())
+        .map_err(|err| format!("Error: Failed to parse config file at {config_path}: {err}"))?;
 
-    println!("Config read from file at {}", config_path);
+    println!("Config read from file at {config_path}");
     Ok(config)
 }
 
@@ -57,7 +49,7 @@ pub fn read_config_from_file() -> Result<Config, String> {
 pub fn read_config_from_env() -> Result<Config, String> {
     let config = envy::prefixed("APP_")
         .from_env()
-        .map_err(|err| format!("Error: Could not parse config from env: {}", err))?;
+        .map_err(|err| format!("Error: Could not parse config from env: {err}"))?;
 
     println!("Config read from environment");
     Ok(config)
