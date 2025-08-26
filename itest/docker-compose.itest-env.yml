@@ -7,10 +7,12 @@ services:
       APP_VAULTWARDEN_ADMIN_TOKEN: "admin"
       APP_LDAP_HOST: "ldap"
       APP_LDAP_BIND_DN: "cn=admin,dc=example,dc=org"
-      APP_LDAP_BIND_PASSWORD: "admin"
+      APP_LDAP_BIND_PASSWORD_FILE: "/ldap_bind_password"
       APP_LDAP_SEARCH_BASE_DN: "dc=example,dc=org"
       APP_LDAP_SEARCH_FILTER: "(&(objectClass=*)(uid=*))"
       APP_LDAP_SYNC_LOOP: "false"
+    volumes:
+      - "./itest/ldap_bind_password:/ldap_bind_password"
 
   vaultwarden: {}
 
