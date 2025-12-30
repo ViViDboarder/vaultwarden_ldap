@@ -26,7 +26,7 @@ services:
       I_REALLY_WANT_VOLATILE_STORAGE: 'true'
 
   ldap:
-    image: bitnami/openldap:latest
+    image: bitnamilegacy/openldap:latest
     environment:
       LDAP_PORT_NUMBER: 389
       LDAP_ROOT: dc=example,dc=org
