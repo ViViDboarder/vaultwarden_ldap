@@ -111,7 +111,7 @@ impl Client {
         match &self.cookie {
             Some(_) => self
                 .cookie_created
-                .is_none_or(|created| (created.elapsed() >= COOKIE_LIFESPAN)),
+                .is_none_or(|created| created.elapsed() >= COOKIE_LIFESPAN),
             None => true,
         }
     }
