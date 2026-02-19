@@ -2,7 +2,9 @@
 name: Integration Test
 
 "on":
-  push: {}
+  push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
@@ -13,6 +15,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Start service dependencies
         uses: hoverkraft-tech/compose-action@v2.3.0
         with:
@@ -24,6 +27,7 @@ jobs:
           services: |
             vaultwarden
             ldap
+
       - name: Run itest
         run: |
           sleep 5
@@ -32,6 +36,7 @@ jobs:
           grep -q "Try to invite user: test+plus@example.com" itest.log
           docker compose logs vaultwarden | grep -q "POST /admin/invite application/json => 200 OK"
           make clean-itest
+
       - name: Run itest-anon
         run: |
           make itest-up-anon
@@ -41,6 +46,7 @@ jobs:
           grep -q "Try to invite user: test+plus@example.com" itest.log
           docker compose logs vaultwarden | grep -q "POST /admin/invite application/json => 200 OK"
           make clean-itest
+
       - name: Run itest-env
         run: |
           make itest-up-env
