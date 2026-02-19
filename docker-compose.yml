@@ -26,17 +26,17 @@ services:
       I_REALLY_WANT_VOLATILE_STORAGE: 'true'
 
   ldap:
-    image: bitnami/openldap:latest
+    image: osixia/openldap:1.5.0
+    command: [
+      "--copy-service",
+      "--loglevel", "debug",
+    ]
     environment:
-      LDAP_PORT_NUMBER: 389
-      LDAP_ROOT: dc=example,dc=org
-      LDAP_ADMIN_USERNAME: admin
       LDAP_ADMIN_PASSWORD: adminpassword
+      LDAP_READONLY_USER: 'true'
 
-      LDAP_SKIP_DEFAULT_TREE: yes
-      LDAP_CUSTOM_LDIF_DIR: /ldifs
     volumes:
-      - ./itest/ldif:/ldifs
+      - ./itest/ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom:z
 
   ldap_admin:
     image: osixia/phpldapadmin

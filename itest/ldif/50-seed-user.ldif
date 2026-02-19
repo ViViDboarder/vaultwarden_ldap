@@ -3,12 +3,6 @@
 
 version: 1
 
-dn: dc=example,dc=org
-dc: example
-objectClass: dcObject
-objectClass: organizationalUnit
-ou: Example Org
-
 # Entry 1: Users group
 dn: cn=Users,dc=example,dc=org
 cn: Users
