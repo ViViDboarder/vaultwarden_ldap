@@ -153,7 +153,7 @@ fn invite_from_ldap(
         if let Some(user_email) = ldap_user
             .attrs
             .get(mail_field.as_str())
-            .and_then(|l| (l.first()))
+            .and_then(|l| l.first())
         {
             if existing_users.contains(&user_email.to_lowercase()) {
                 println!("User with email already exists: {user_email}");
