@@ -16,7 +16,7 @@ COPY src ./src
 RUN cargo build --release
 
 # Use most recent ubuntu LTS release
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 RUN apt-get update \
     && apt-get install -y --no-install-recommends 'ca-certificates=20240203' 'libssl-dev=3.*' \
     && rm -rf /var/cache/apt/lists
